@@ -1,0 +1,25 @@
+{
+  "name": "node-support",
+  "version": "0.0.0-development",
+  "description": "List the Node.js versions supported by the package/repository",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "lab -a @hapi/code -L -t 100"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pkgjs/node-support.git"
+  },
+  "author": "Dominykas Blyžė <hello@dominykas.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pkgjs/node-support/issues"
+  },
+  "homepage": "https://github.com/pkgjs/node-support#readme",
+  "devDependencies": {
+    "@hapi/code": "^7.0.0",
+    "@hapi/lab": "^21.0.0",
+    "allow-scripts": "^1.5.2",
+    "semantic-release": "^15.14.0"
+  }
+}

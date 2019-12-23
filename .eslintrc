@@ -1,0 +1,7 @@
+{
+  "extends": "@hapi/hapi",
+
+  "parserOptions": {
+    "ecmaVersion": 2019
+  }
+}
