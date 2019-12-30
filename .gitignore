@@ -1,0 +1,16 @@
+**/node_modules
+**/package-lock.json
+**/npm-shrinkwrap.json
+
+coverage.*
+*.log*
+test-results.xml
+
+**/.DS_Store
+**/._*
+
+**/*.pem
+
+**/.vs
+**/.vscode
+**/.idea
