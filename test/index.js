@@ -21,7 +21,9 @@ internals.prepareFixture = (travisYml) => {
 
     internals.tmpObjects.push(tmpObj);
 
-    Fs.copyFileSync(Path.join(__dirname, 'fixtures', travisYml), Path.join(tmpObj.name, '.travis.yml'));
+    if (travisYml) {
+        Fs.copyFileSync(Path.join(__dirname, 'fixtures', travisYml), Path.join(tmpObj.name, '.travis.yml'));
+    }
 
     Fs.writeFileSync(Path.join(tmpObj.name, 'package.json'), JSON.stringify({
         name: 'test-module',
@@ -48,7 +50,7 @@ describe('node-support', () => {
 
         describe('path', () => {
 
-            it('returns node versions from .travis.yml at the path', async () => {
+            it('returns node versions from `.travis.yml` at the path', async () => {
 
                 const path = Path.join(__dirname, '..');
 
@@ -63,9 +65,21 @@ describe('node-support', () => {
                 });
             });
 
+            it('leaves out `travis` when no `.travis.yml` present', async () => {
+
+                const path = internals.prepareFixture();
+
+                const result = await NodeSupport.detect({ path });
+
+                expect(result).to.equal({
+                    name: 'test-module',
+                    version: '0.0.0-development'
+                });
+            });
+
             it('returns the single node version', async () => {
 
-                const path = internals.prepareFixture('single-version.yml');
+                const path = internals.prepareFixture('_single-version.yml');
 
                 const result = await NodeSupport.detect({ path });
 
@@ -74,6 +88,22 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     travis: {
                         raw: ['10']
+                    }
+                });
+            });
+
+
+            it('returns default node version', async () => {
+
+                const path = internals.prepareFixture('_minimal.yml');
+
+                const result = await NodeSupport.detect({ path });
+
+                expect(result).to.equal({
+                    name: 'test-module',
+                    version: '0.0.0-development',
+                    travis: {
+                        raw: ['latest']
                     }
                 });
             });
@@ -119,6 +149,21 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     travis: {
                         raw: ['4', '6', '7']
+                    }
+                });
+            });
+
+            it('handles missing env.matrix', async () => {
+
+                const path = internals.prepareFixture('_no-env-matrix.yml');
+
+                const result = await NodeSupport.detect({ path });
+
+                expect(result).to.equal({
+                    name: 'test-module',
+                    version: '0.0.0-development',
+                    travis: {
+                        raw: ['latest']
                     }
                 });
             });
