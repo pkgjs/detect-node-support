@@ -107,6 +107,21 @@ describe('node-support', () => {
                 });
             });
 
+            it('returns empty array when no node detected', async () => {
+
+                const path = internals.prepareFixture('_no-node.yml');
+
+                const result = await NodeSupport.detect({ path });
+
+                expect(result).to.equal({
+                    name: 'test-module',
+                    version: '0.0.0-development',
+                    travis: {
+                        raw: []
+                    }
+                });
+            });
+
             it('returns node versions from matrix env vars (NODEJS_VER)', async () => {
 
                 const path = internals.prepareFixture('kangax-html-minifier.yml');
