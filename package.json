@@ -21,5 +21,8 @@
     "@hapi/lab": "^21.0.0",
     "allow-scripts": "^1.5.2",
     "semantic-release": "^15.14.0"
+  },
+  "dependencies": {
+    "js-yaml": "^3.13.1"
   }
 }

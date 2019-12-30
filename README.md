@@ -64,7 +64,8 @@ const result = {
     // the current time when the result is returned
     timestamp: 1577115956099,
 
-    // git commit hash of the repository HEAD at the time of scanning
+    // git commit hash of the repository HEAD at the time of scanning `path` / `repository`
+    // git commit hash for git tag of the `version` when used with `package`
     // will be left out when no git repository detected
     commit: "2de28c8c4ab8ac998d403509123736929131908c",
 
