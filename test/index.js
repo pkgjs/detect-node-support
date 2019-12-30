@@ -48,7 +48,7 @@ describe('node-support', () => {
 
         describe('path', () => {
 
-            it('returns node versions from iamitcs-nodejs-nan.yml at the path', async () => {
+            it('returns node versions from .travis.yml at the path', async () => {
 
                 const path = Path.join(__dirname, '..');
 
@@ -104,6 +104,21 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     travis: {
                         raw: ['0.10', '0.12', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', 'lts/*']
+                    }
+                });
+            });
+
+            it('returns node versions from matrix env vars (NODE_VER)', async () => {
+
+                const path = internals.prepareFixture('reactivex-rxjs.yml');
+
+                const result = await NodeSupport.detect({ path });
+
+                expect(result).to.equal({
+                    name: 'test-module',
+                    version: '0.0.0-development',
+                    travis: {
+                        raw: ['4', '6', '7']
                     }
                 });
             });
