@@ -92,7 +92,6 @@ describe('node-support', () => {
                 });
             });
 
-
             it('returns default node version', async () => {
 
                 const path = internals.prepareFixture('_minimal.yml');
@@ -149,6 +148,21 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     travis: {
                         raw: ['4', '6', '7']
+                    }
+                });
+            });
+
+            it('returns node versions from matrix include', async () => {
+
+                const path = internals.prepareFixture('nodejs-readable-stream.yml');
+
+                const result = await NodeSupport.detect({ path });
+
+                expect(result).to.equal({
+                    name: 'test-module',
+                    version: '0.0.0-development',
+                    travis: {
+                        raw: ['6', '8', '9', '10', '12', 'stable']
                     }
                 });
             });
