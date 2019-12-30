@@ -48,25 +48,24 @@ const result = await require('node-support').detect({ repository });
 
 - Throws if the `path` / `repository` does not have a `package.json`
 - Throws if `package` does not exist in the registry
+- Throws when unable to detect a git repository for the package
 
 Otherwise returns an object with:
 
 ```javascript
 const result = {
 
-    // the "name" field of the `package.json`
+    // the `name` field of the `package.json`
     name: "package-name",    
     
-    // the "version" field of the `package.json` when used with `path` / `repository`,
+    // the `version` field of the `package.json` when used with `path` / `repository`,
     // the `latest` dist-tag version when used with `package`
     version: "0.0.0",
 
     // the current time when the result is returned
     timestamp: 1577115956099,
 
-    // git commit hash of the repository HEAD at the time of scanning `path` / `repository`
-    // git commit hash for git tag of the `version` when used with `package`
-    // will be left out when no git repository detected
+    // git commit hash of the repository HEAD at the time of scanning
     commit: "2de28c8c4ab8ac998d403509123736929131908c",
 
     // will be left out when not present in the `package.json`
