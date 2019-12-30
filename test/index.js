@@ -152,6 +152,21 @@ describe('node-support', () => {
                 });
             });
 
+            it('handles non-matching matrix env vars', async () => {
+
+                const path = internals.prepareFixture('caolan-async.yml');
+
+                const result = await NodeSupport.detect({ path });
+
+                expect(result).to.equal({
+                    name: 'test-module',
+                    version: '0.0.0-development',
+                    travis: {
+                        raw: ['8', '10', '12']
+                    }
+                });
+            });
+
             it('returns node versions from matrix include', async () => {
 
                 const path = internals.prepareFixture('nodejs-readable-stream.yml');
@@ -163,6 +178,36 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     travis: {
                         raw: ['6', '8', '9', '10', '12', 'stable']
+                    }
+                });
+            });
+
+            it('handles single matrix include', async () => {
+
+                const path = internals.prepareFixture('postcss-autoprefixer.yml');
+
+                const result = await NodeSupport.detect({ path });
+
+                expect(result).to.equal({
+                    name: 'test-module',
+                    version: '0.0.0-development',
+                    travis: {
+                        raw: ['node', '10', '12', '8', '6']
+                    }
+                });
+            });
+
+            it('handles matrix includes without node versions', async () => {
+
+                const path = internals.prepareFixture('shinn-is-resolvable.yml');
+
+                const result = await NodeSupport.detect({ path });
+
+                expect(result).to.equal({
+                    name: 'test-module',
+                    version: '0.0.0-development',
+                    travis: {
+                        raw: ['node']
                     }
                 });
             });

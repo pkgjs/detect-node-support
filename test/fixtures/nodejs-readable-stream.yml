@@ -1,3 +1,5 @@
+# Source: https://github.com/nodejs/readable-stream/blob/ed213f0dfdc0da6ed94f1aefc54808cc1f74da7c/.travis.yml
+
 language: node_js
 notifications:
   email: false

@@ -1,3 +1,5 @@
+# Source: https://github.com/nodejs/nan/blob/60e86a9d4c4536fbbd2a76814470edd66b23114e/.travis.yml
+
 os:
   - linux
   - osx
