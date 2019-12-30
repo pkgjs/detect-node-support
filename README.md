@@ -33,10 +33,10 @@ const result = await require('node-support').detect({ path });
 `path` should be a folder in the local file system. When the path is not a git repository - tries to read the git repository from `package.json` and tries to detect the versions listed in the repository as well. 
 
 ```
-const result = await require('node-support').detect({ package });
+const result = await require('node-support').detect({ packageName });
 ```
 
-`package` is a string name for the package in the registry. 
+`packageName` is a string name for the package in the registry. 
 
 ```
 const result = await require('node-support').detect({ repository });
@@ -47,7 +47,7 @@ const result = await require('node-support').detect({ repository });
 ### Result
 
 - Throws if the `path` / `repository` does not have a `package.json`
-- Throws if `package` does not exist in the registry
+- Throws if `packageName` does not exist in the registry
 - Throws when unable to detect a git repository for the package
 
 Otherwise returns an object with:
