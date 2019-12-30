@@ -242,5 +242,22 @@ describe('node-support', () => {
                 });
             });
         });
+
+
+        describe('repository', () => {
+
+            it('returns node versions from `.travis.yml` in the repository', async () => {
+
+                const result = await NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/node-support.git' });
+
+                expect(result).to.equal({
+                    name: 'node-support',
+                    version: '0.0.0-development',
+                    travis: {
+                        raw: ['10', '12', '13']
+                    }
+                });
+            });
+        });
     });
 });
