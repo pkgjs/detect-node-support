@@ -3,6 +3,7 @@
 const Fs = require('fs');
 const Nock = require('nock');
 const Path = require('path');
+const Sinon = require('sinon');
 const Tmp = require('tmp');
 
 const NodeSupport = require('..');
@@ -37,6 +38,11 @@ internals.prepareFixture = (travisYml) => {
 
 describe('node-support', () => {
 
+    beforeEach(() => {
+
+        Sinon.useFakeTimers(new Date('2020-02-02T20:00:02Z'));
+    });
+
     afterEach(() => {
 
         internals.tmpObjects.forEach((tmpObj) => {
@@ -45,6 +51,8 @@ describe('node-support', () => {
         });
 
         internals.tmpObjects = [];
+
+        Sinon.restore();
     });
 
     describe('detect()', () => {
@@ -60,6 +68,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'node-support',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: ['10', '12', '13']
                     }
@@ -74,7 +83,8 @@ describe('node-support', () => {
 
                 expect(result).to.equal({
                     name: 'test-module',
-                    version: '0.0.0-development'
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000
                 });
             });
 
@@ -87,6 +97,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: ['10']
                     }
@@ -102,6 +113,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: ['latest']
                     }
@@ -117,6 +129,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: []
                     }
@@ -132,6 +145,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: ['6', '8', '10', 'latest']
                     }
@@ -147,6 +161,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: ['0.10', '0.12', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', 'lts/*']
                     }
@@ -162,6 +177,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: ['4', '6', '7']
                     }
@@ -177,6 +193,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: ['8', '10', '12']
                     }
@@ -192,6 +209,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: ['6', '8', '9', '10', '12', 'stable']
                     }
@@ -207,6 +225,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: ['node', '10', '12', '8', '6']
                     }
@@ -222,6 +241,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: ['node']
                     }
@@ -237,6 +257,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: ['latest']
                     }
@@ -273,6 +294,7 @@ describe('node-support', () => {
                 expect(result).to.equal({
                     name: 'node-support',
                     version: '0.0.0-development',
+                    timestamp: 1580673602000,
                     travis: {
                         raw: ['10', '12', '13']
                     }

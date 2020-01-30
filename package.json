@@ -22,6 +22,7 @@
     "allow-scripts": "^1.5.2",
     "nock": "^11.7.2",
     "semantic-release": "^15.14.0",
+    "sinon": "^8.1.1",
     "tmp": "^0.1.0"
   },
   "dependencies": {
