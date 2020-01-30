@@ -15,6 +15,9 @@
   "bugs": {
     "url": "https://github.com/pkgjs/node-support/issues"
   },
+  "engines": {
+    "node": ">=10"
+  },
   "homepage": "https://github.com/pkgjs/node-support#readme",
   "devDependencies": {
     "@hapi/code": "^7.0.0",
