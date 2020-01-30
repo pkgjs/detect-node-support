@@ -1,13 +1,14 @@
 'use strict';
 
 const Fs = require('fs');
+const Nock = require('nock');
 const Path = require('path');
 const Tmp = require('tmp');
 
 const NodeSupport = require('..');
 
 
-const { describe, it, afterEach } = exports.lab = require('@hapi/lab').script();
+const { describe, it, beforeEach, afterEach } = exports.lab = require('@hapi/lab').script();
 const { expect } = require('@hapi/code');
 
 
@@ -246,7 +247,26 @@ describe('node-support', () => {
 
         describe('repository', () => {
 
+            beforeEach(() => {
+
+                if (!Nock.isActive()) {
+                    Nock.activate();
+                }
+            });
+
+            afterEach(() => {
+
+                Nock.restore();
+                Nock.cleanAll();
+            });
+
             it('returns node versions from `.travis.yml` in the repository', async () => {
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/node-support/HEAD/package.json')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
+                    .get('/pkgjs/node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
 
                 const result = await NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/node-support.git' });
 
@@ -257,6 +277,12 @@ describe('node-support', () => {
                         raw: ['10', '12', '13']
                     }
                 });
+            });
+
+            it('throws when a package does not live on public github.com', async () => {
+
+                await expect(NodeSupport.detect({ repository: 'git+https://github.example.com/pkgjs/node-support.git' }))
+                    .to.reject('Only github.com paths supported, feel free to PR at https://github.com/pkgjs/node-support');
             });
         });
     });
