@@ -4,6 +4,7 @@ const Fs = require('fs');
 const Nock = require('nock');
 const Path = require('path');
 const Sinon = require('sinon');
+const SimpleGit = require('simple-git/promise');
 const Tmp = require('tmp');
 
 const NodeSupport = require('..');
@@ -17,11 +18,15 @@ const internals = {
     tmpObjects: []
 };
 
-internals.prepareFixture = ({ travisYml, packageJson } = {}) => {
+internals.prepareFixture = async ({ travisYml, packageJson, git = true } = {}) => {
 
     const tmpObj = Tmp.dirSync({ unsafeCleanup: true });
 
     internals.tmpObjects.push(tmpObj);
+
+    if (git) {
+        await SimpleGit(tmpObj.name).init();
+    }
 
     if (travisYml) {
         Fs.copyFileSync(Path.join(__dirname, 'fixtures', travisYml), Path.join(tmpObj.name, '.travis.yml'));
@@ -78,7 +83,7 @@ describe('node-support', () => {
 
             it('leaves out `travis` when no `.travis.yml` present', async () => {
 
-                const path = internals.prepareFixture();
+                const path = await internals.prepareFixture();
 
                 const result = await NodeSupport.detect({ path });
 
@@ -91,7 +96,7 @@ describe('node-support', () => {
 
             it('returns the single node version', async () => {
 
-                const path = internals.prepareFixture({
+                const path = await internals.prepareFixture({
                     travisYml: '_single-version.yml'
                 });
 
@@ -109,7 +114,7 @@ describe('node-support', () => {
 
             it('returns default node version', async () => {
 
-                const path = internals.prepareFixture({
+                const path = await internals.prepareFixture({
                     travisYml: '_minimal.yml'
                 });
 
@@ -127,7 +132,7 @@ describe('node-support', () => {
 
             it('returns empty array when no node detected', async () => {
 
-                const path = internals.prepareFixture({
+                const path = await internals.prepareFixture({
                     travisYml: '_no-node.yml'
                 });
 
@@ -145,7 +150,7 @@ describe('node-support', () => {
 
             it('returns node versions from matrix env vars (NODEJS_VER)', async () => {
 
-                const path = internals.prepareFixture({
+                const path = await internals.prepareFixture({
                     travisYml: 'kangax-html-minifier.yml'
                 });
 
@@ -163,7 +168,7 @@ describe('node-support', () => {
 
             it('returns node versions from matrix env vars (TRAVIS_NODE_VERSION)', async () => {
 
-                const path = internals.prepareFixture({
+                const path = await internals.prepareFixture({
                     travisYml: 'nodejs-nan.yml'
                 });
 
@@ -181,7 +186,7 @@ describe('node-support', () => {
 
             it('returns node versions from matrix env vars (NODE_VER)', async () => {
 
-                const path = internals.prepareFixture({
+                const path = await internals.prepareFixture({
                     travisYml: 'reactivex-rxjs.yml'
                 });
 
@@ -199,7 +204,7 @@ describe('node-support', () => {
 
             it('handles non-matching matrix env vars', async () => {
 
-                const path = internals.prepareFixture({
+                const path = await internals.prepareFixture({
                     travisYml: 'caolan-async.yml'
                 });
 
@@ -217,7 +222,7 @@ describe('node-support', () => {
 
             it('returns node versions from matrix include', async () => {
 
-                const path = internals.prepareFixture({
+                const path = await internals.prepareFixture({
                     travisYml: 'nodejs-readable-stream.yml'
                 });
 
@@ -235,7 +240,7 @@ describe('node-support', () => {
 
             it('handles single matrix include', async () => {
 
-                const path = internals.prepareFixture({
+                const path = await internals.prepareFixture({
                     travisYml: 'postcss-autoprefixer.yml'
                 });
 
@@ -253,7 +258,7 @@ describe('node-support', () => {
 
             it('handles matrix includes without node versions', async () => {
 
-                const path = internals.prepareFixture({
+                const path = await internals.prepareFixture({
                     travisYml: 'shinn-is-resolvable.yml'
                 });
 
@@ -271,7 +276,7 @@ describe('node-support', () => {
 
             it('handles missing env.matrix', async () => {
 
-                const path = internals.prepareFixture({
+                const path = await internals.prepareFixture({
                     travisYml: '_no-env-matrix.yml'
                 });
 
@@ -285,6 +290,14 @@ describe('node-support', () => {
                         raw: ['latest']
                     }
                 });
+            });
+
+            it('throws when path is not a git repo', async () => {
+
+                const path = await internals.prepareFixture({ git: false });
+
+                await expect(NodeSupport.detect({ path }))
+                    .to.reject(`${path} is not a git repository`);
             });
         });
 
