@@ -1,0 +1,55 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const Fs = require('fs');
+const NodeSupport = require('..');
+const { URL } = require('url');
+
+
+const internals = {};
+
+
+internals.autoDetect = (what) => {
+
+    if (!what) {
+        return NodeSupport.detect({ path: '.' });
+    }
+
+    try {
+        var url = new URL(what);
+    }
+    catch (err) {
+        if (err.code !== 'ERR_INVALID_URL') {
+            throw err;
+        }
+    }
+
+    if (url) {
+        return NodeSupport.detect({ repository: url.href });
+    }
+
+    if (Fs.existsSync(what)) {
+        return NodeSupport.detect({ path: what });
+    }
+
+    if (what.includes('/') && !what.startsWith('@')) {
+        return  NodeSupport.detect({ repository: `https://github.com/${what}` });
+    }
+
+    return NodeSupport.detect({ packageName: what });
+};
+
+exports.main = async (nodeBin, thisBin, what) => {
+
+    const result = await internals.autoDetect(what);
+
+    console.log(result);
+};
+
+exports.main(...process.argv)
+    .catch((err) => {
+
+        console.error(err);
+        process.exit(1);
+    });

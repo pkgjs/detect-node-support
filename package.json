@@ -4,6 +4,7 @@
   "description": "List the Node.js versions supported by the package/repository",
   "main": "lib/index.js",
   "scripts": {
+    "test-cli": " while read p; do echo \"./bin/node-support $p\"; ./bin/node-support $p; done < ./test/cli-test.txt",
     "test": "lab -a @hapi/code -L -p 1 -t 100"
   },
   "repository": {

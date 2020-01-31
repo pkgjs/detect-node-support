@@ -1,0 +1,7 @@
+
+.
+node-support
+@hapi/hapi
+pkgjs/node-support
+https://github.com/pkgjs/node-support
+git+https://github.com/pkgjs/node-support.git
