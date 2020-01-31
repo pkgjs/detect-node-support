@@ -400,5 +400,53 @@ describe('node-support', () => {
                     .to.reject('Only github.com paths supported, feel free to PR at https://github.com/pkgjs/node-support');
             });
         });
+
+        describe('packageName', () => {
+
+            beforeEach(() => {
+
+                if (!Nock.isActive()) {
+                    Nock.activate();
+                }
+            });
+
+            afterEach(() => {
+
+                Nock.restore();
+                Nock.cleanAll();
+            });
+
+            it('returns node versions from `.travis.yml` in the package repository', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/node-support/HEAD/package.json')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
+                    .get('/pkgjs/node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                Nock('https://registry.npmjs.org')
+                    .get('/node-support')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')));
+
+                const result = await NodeSupport.detect({ packageName: 'node-support' });
+
+                expect(listRemoteStub.callCount).to.equal(1);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/node-support.git', 'HEAD']]);
+
+                expect(result).to.equal({
+                    name: 'node-support',
+                    version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '13']
+                    },
+                    engines: '>=10'
+                });
+            });
+        });
     });
 });

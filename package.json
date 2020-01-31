@@ -32,6 +32,7 @@
     "@hapi/wreck": "^16.0.1",
     "git-url-parse": "^11.1.2",
     "js-yaml": "^3.13.1",
+    "pacote": "^10.3.1",
     "simple-git": "^1.131.0"
   }
 }
