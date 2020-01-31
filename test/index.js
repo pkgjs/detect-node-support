@@ -9,6 +9,8 @@ const Tmp = require('tmp');
 
 const NodeSupport = require('..');
 
+const Utils = require('../lib/utils');
+
 
 const { describe, it, beforeEach, afterEach } = exports.lab = require('@hapi/lab').script();
 const { expect } = require('@hapi/code');
@@ -24,10 +26,6 @@ internals.prepareFixture = async ({ travisYml, packageJson, git = true } = {}) =
 
     internals.tmpObjects.push(tmpObj);
 
-    if (git) {
-        await SimpleGit(tmpObj.name).init();
-    }
-
     if (travisYml) {
         Fs.copyFileSync(Path.join(__dirname, 'fixtures', travisYml), Path.join(tmpObj.name, '.travis.yml'));
     }
@@ -37,15 +35,41 @@ internals.prepareFixture = async ({ travisYml, packageJson, git = true } = {}) =
         version: '0.0.0-development'
     }));
 
+    if (git) {
+        const simpleGit = SimpleGit(tmpObj.name);
+        await simpleGit.init();
+        await simpleGit.add('./*');
+        await simpleGit.commit('initial commit', ['--no-gpg-sign']);
+    }
+
     return tmpObj.name;
 };
 
 
+internals.assertCommit = (result) => {
+
+    expect(result.commit).to.match(/^[0-9a-f]{40}$/);
+    delete result.commit;
+};
+
 describe('node-support', () => {
+
+    let listRemoteStub;
 
     beforeEach(() => {
 
         Sinon.useFakeTimers(new Date('2020-02-02T20:00:02Z'));
+
+        listRemoteStub = Sinon.stub().throws();
+
+        Sinon.stub(Utils, 'simpleGit').callsFake((...args) => {
+
+            const simpleGit = SimpleGit(...args);
+
+            Sinon.stub(simpleGit, 'listRemote').callsFake(listRemoteStub);
+
+            return simpleGit;
+        });
     });
 
     afterEach(() => {
@@ -70,6 +94,8 @@ describe('node-support', () => {
 
                 const result = await NodeSupport.detect({ path });
 
+                internals.assertCommit(result);
+
                 expect(result).to.equal({
                     name: 'node-support',
                     version: '0.0.0-development',
@@ -87,6 +113,8 @@ describe('node-support', () => {
 
                 const result = await NodeSupport.detect({ path });
 
+                internals.assertCommit(result);
+
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
@@ -101,6 +129,8 @@ describe('node-support', () => {
                 });
 
                 const result = await NodeSupport.detect({ path });
+
+                internals.assertCommit(result);
 
                 expect(result).to.equal({
                     name: 'test-module',
@@ -120,6 +150,8 @@ describe('node-support', () => {
 
                 const result = await NodeSupport.detect({ path });
 
+                internals.assertCommit(result);
+
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
@@ -137,6 +169,8 @@ describe('node-support', () => {
                 });
 
                 const result = await NodeSupport.detect({ path });
+
+                internals.assertCommit(result);
 
                 expect(result).to.equal({
                     name: 'test-module',
@@ -156,6 +190,8 @@ describe('node-support', () => {
 
                 const result = await NodeSupport.detect({ path });
 
+                internals.assertCommit(result);
+
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
@@ -173,6 +209,8 @@ describe('node-support', () => {
                 });
 
                 const result = await NodeSupport.detect({ path });
+
+                internals.assertCommit(result);
 
                 expect(result).to.equal({
                     name: 'test-module',
@@ -192,6 +230,8 @@ describe('node-support', () => {
 
                 const result = await NodeSupport.detect({ path });
 
+                internals.assertCommit(result);
+
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
@@ -209,6 +249,8 @@ describe('node-support', () => {
                 });
 
                 const result = await NodeSupport.detect({ path });
+
+                internals.assertCommit(result);
 
                 expect(result).to.equal({
                     name: 'test-module',
@@ -228,6 +270,8 @@ describe('node-support', () => {
 
                 const result = await NodeSupport.detect({ path });
 
+                internals.assertCommit(result);
+
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
@@ -245,6 +289,8 @@ describe('node-support', () => {
                 });
 
                 const result = await NodeSupport.detect({ path });
+
+                internals.assertCommit(result);
 
                 expect(result).to.equal({
                     name: 'test-module',
@@ -264,6 +310,8 @@ describe('node-support', () => {
 
                 const result = await NodeSupport.detect({ path });
 
+                internals.assertCommit(result);
+
                 expect(result).to.equal({
                     name: 'test-module',
                     version: '0.0.0-development',
@@ -281,6 +329,8 @@ describe('node-support', () => {
                 });
 
                 const result = await NodeSupport.detect({ path });
+
+                internals.assertCommit(result);
 
                 expect(result).to.equal({
                     name: 'test-module',
@@ -301,7 +351,6 @@ describe('node-support', () => {
             });
         });
 
-
         describe('repository', () => {
 
             beforeEach(() => {
@@ -319,6 +368,9 @@ describe('node-support', () => {
 
             it('returns node versions from `.travis.yml` in the repository', async () => {
 
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
                 Nock('https://raw.githubusercontent.com')
                     .get('/pkgjs/node-support/HEAD/package.json')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
@@ -327,9 +379,13 @@ describe('node-support', () => {
 
                 const result = await NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/node-support.git' });
 
+                expect(listRemoteStub.callCount).to.equal(1);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/node-support.git', 'HEAD']]);
+
                 expect(result).to.equal({
                     name: 'node-support',
                     version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
                         raw: ['10', '12', '13']
