@@ -528,6 +528,61 @@ describe('node-support', () => {
                 await expect(NodeSupport.detect({ packageName: 'node-support' }))
                     .to.reject('Something went wrong');
             });
+
+            it('throws when packument does not contain a `repository` field', async () => {
+
+                Nock('https://registry.npmjs.org')
+                    .get('/node-support')
+                    .reply(200, JSON.stringify({ name: 'node-support' }));
+
+                await expect(NodeSupport.detect({ packageName: 'node-support' }))
+                    .to.reject('Unable to determine the git repository for node-support');
+            });
+
+            it('throws when packument does not contain a `repository.url` field', async () => {
+
+                Nock('https://registry.npmjs.org')
+                    .get('/node-support')
+                    .reply(200, JSON.stringify({ name: 'node-support', repository: {} }));
+
+                await expect(NodeSupport.detect({ packageName: 'node-support' }))
+                    .to.reject('Unable to determine the git repository for node-support');
+            });
+
+            it('returns node versions from `.travis.yml` in the package repository (string repository)', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/node-support/HEAD/package.json')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
+                    .get('/pkgjs/node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                Nock('https://registry.npmjs.org')
+                    .get('/node-support')
+                    .reply(200, JSON.stringify({
+                        name: 'node-support',
+                        repository: 'git+https://github.com/pkgjs/node-support.git'
+                    }));
+
+                const result = await NodeSupport.detect({ packageName: 'node-support' });
+
+                expect(listRemoteStub.callCount).to.equal(1);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/node-support.git', 'HEAD']]);
+
+                expect(result).to.equal({
+                    name: 'node-support',
+                    version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '13']
+                    },
+                    engines: '>=10'
+                });
+            });
         });
     });
 });
