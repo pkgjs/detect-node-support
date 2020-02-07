@@ -6,6 +6,7 @@ const Path = require('path');
 const Sinon = require('sinon');
 const SimpleGit = require('simple-git/promise');
 const Tmp = require('tmp');
+const Wreck = require('@hapi/wreck');
 
 const NodeSupport = require('..');
 
@@ -405,6 +406,43 @@ describe('node-support', () => {
                     },
                     engines: '>=10'
                 });
+            });
+
+            it('throws when repository does not have a package.json', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/node-support/HEAD/package.json')
+                    .reply(404)
+                    .get('/pkgjs/node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/node-support.git' }))
+                    .to.reject(`git+https://github.com/pkgjs/node-support.git does not contain a package.json`);
+            });
+
+            it('rethrows server errors', async () => {
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/node-support/HEAD/package.json')
+                    .reply(500)
+                    .get('/pkgjs/node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/node-support.git' }))
+                    .to.reject(/Response Error/);
+            });
+
+            it('rethrows generic errors', async () => {
+
+                const err = new Error('Something went wrong');
+
+                Sinon.stub(Wreck, 'get').throws(err);
+
+                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/node-support.git' }))
+                    .to.reject('Something went wrong');
             });
 
             it('throws when a package does not live on public github.com', async () => {
