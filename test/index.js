@@ -498,6 +498,36 @@ describe('node-support', () => {
                     engines: '>=10'
                 });
             });
+
+            it('throws when package does not exist in the registry', async () => {
+
+                Nock('https://registry.npmjs.org')
+                    .get('/node-support')
+                    .reply(404);
+
+                await expect(NodeSupport.detect({ packageName: 'node-support' }))
+                    .to.reject(`Package node-support does not exist`);
+            });
+
+            it('rethrows registry server errors', async () => {
+
+                Nock('https://registry.npmjs.org')
+                    .get('/node-support')
+                    .reply(500);
+
+                await expect(NodeSupport.detect({ packageName: 'node-support' }))
+                    .to.reject(/Internal Server Error/);
+            });
+
+            it('rethrows generic errors', async () => {
+
+                const err = new Error('Something went wrong');
+
+                Sinon.stub(Wreck, 'get').throws(err);
+
+                await expect(NodeSupport.detect({ packageName: 'node-support' }))
+                    .to.reject('Something went wrong');
+            });
         });
     });
 });
