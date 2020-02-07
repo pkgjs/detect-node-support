@@ -30,10 +30,12 @@ internals.prepareFixture = async ({ travisYml, packageJson, git = true } = {}) =
         Fs.copyFileSync(Path.join(__dirname, 'fixtures', travisYml), Path.join(tmpObj.name, '.travis.yml'));
     }
 
-    Fs.writeFileSync(Path.join(tmpObj.name, 'package.json'), JSON.stringify(packageJson || {
-        name: 'test-module',
-        version: '0.0.0-development'
-    }));
+    if (packageJson !== false) {
+        Fs.writeFileSync(Path.join(tmpObj.name, 'package.json'), JSON.stringify(packageJson || {
+            name: 'test-module',
+            version: '0.0.0-development'
+        }));
+    }
 
     if (git) {
         const simpleGit = SimpleGit(tmpObj.name);
@@ -125,7 +127,7 @@ describe('node-support', () => {
             it('returns the single node version', async () => {
 
                 const path = await internals.prepareFixture({
-                    travisYml: '_single-version.yml'
+                    travisYml: 'testing-single-version.yml'
                 });
 
                 const result = await NodeSupport.detect({ path });
@@ -145,7 +147,7 @@ describe('node-support', () => {
             it('returns default node version', async () => {
 
                 const path = await internals.prepareFixture({
-                    travisYml: '_minimal.yml'
+                    travisYml: 'testing-minimal.yml'
                 });
 
                 const result = await NodeSupport.detect({ path });
@@ -165,7 +167,7 @@ describe('node-support', () => {
             it('returns empty array when no node detected', async () => {
 
                 const path = await internals.prepareFixture({
-                    travisYml: '_no-node.yml'
+                    travisYml: 'testing-no-node.yml'
                 });
 
                 const result = await NodeSupport.detect({ path });
@@ -325,7 +327,7 @@ describe('node-support', () => {
             it('handles missing env.matrix', async () => {
 
                 const path = await internals.prepareFixture({
-                    travisYml: '_no-env-matrix.yml'
+                    travisYml: 'testing-no-env-matrix.yml'
                 });
 
                 const result = await NodeSupport.detect({ path });
@@ -348,6 +350,17 @@ describe('node-support', () => {
 
                 await expect(NodeSupport.detect({ path }))
                     .to.reject(`${path} is not a git repository`);
+            });
+
+            it('throws when path does not have a package.json', async () => {
+
+                const path = await internals.prepareFixture({
+                    travisYml: 'testing-no-node.yml',
+                    packageJson: false
+                });
+
+                await expect(NodeSupport.detect({ path }))
+                    .to.reject(`${path} does not contain a package.json`);
             });
         });
 
