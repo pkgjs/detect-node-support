@@ -61,9 +61,10 @@ describe('node-support', () => {
 
     beforeEach(() => {
 
-        Sinon.useFakeTimers(new Date('2020-02-02T20:00:02Z'));
-
         listRemoteStub = Sinon.stub().throws();
+
+        Sinon.stub(Date, 'now')
+            .returns(+new Date('2020-02-02T20:00:02Z'));
 
         Sinon.stub(Utils, 'simpleGit').callsFake((...args) => {
 
@@ -73,6 +74,20 @@ describe('node-support', () => {
 
             return simpleGit;
         });
+
+        if (!Nock.isActive()) {
+            Nock.activate();
+        }
+
+        Nock('https://raw.githubusercontent.com')
+            .persist()
+            .get('/nodejs/Release/master/schedule.json')
+            .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'node-release-schedule.json')));
+
+        Nock('https://nodejs.org')
+            .persist()
+            .get('/dist/index.json')
+            .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'node-release-dist.json')));
     });
 
     afterEach(() => {
@@ -85,6 +100,9 @@ describe('node-support', () => {
         internals.tmpObjects = [];
 
         Sinon.restore();
+
+        Nock.restore();
+        Nock.cleanAll();
     });
 
     describe('detect()', () => {
@@ -104,7 +122,8 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13']
+                        raw: ['10', '12', '13'],
+                        resolved: ['10.19.0', '12.15.0', '13.8.0']
                     },
                     engines: '>=10'
                 });
@@ -140,7 +159,8 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10']
+                        raw: ['10'],
+                        resolved: ['10.19.0']
                     }
                 });
             });
@@ -160,7 +180,8 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['latest']
+                        raw: ['latest'],
+                        resolved: [/*'13.8.0'*/]
                     }
                 });
             });
@@ -180,7 +201,8 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: []
+                        raw: [],
+                        resolved: []
                     }
                 });
             });
@@ -200,7 +222,8 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['6', '8', '10', 'latest']
+                        raw: ['6', '8', '10', 'latest'],
+                        resolved: ['6.17.1', '8.17.0', '10.19.0']
                     }
                 });
             });
@@ -220,7 +243,8 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['0.10', '0.12', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', 'lts/*']
+                        raw: ['0.10', '0.12', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', 'lts/*'],
+                        resolved: ['0.10.48', '0.12.18', '4.9.1', '5.12.0', '6.17.1', '7.10.1', '8.17.0', '9.11.2', '10.19.0', '11.15.0', '12.15.0', '13.8.0', '12.15.0']
                     }
                 });
             });
@@ -240,7 +264,8 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['4', '6', '7']
+                        raw: ['4', '6', '7'],
+                        resolved: ['4.9.1', '6.17.1', '7.10.1']
                     }
                 });
             });
@@ -260,7 +285,8 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['8', '10', '12']
+                        raw: ['8', '10', '12'],
+                        resolved: ['8.17.0', '10.19.0', '12.15.0']
                     }
                 });
             });
@@ -280,7 +306,8 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['6', '8', '9', '10', '12', 'stable']
+                        raw: ['6', '8', '9', '10', '12', 'stable'],
+                        resolved: ['6.17.1', '8.17.0', '9.11.2', '10.19.0', '12.15.0'/*, '13.8.0'*/]
                     }
                 });
             });
@@ -300,7 +327,8 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['node', '10', '12', '8', '6']
+                        raw: ['node', '10', '12', '8', '6'],
+                        resolved: [/*'13.8.0', */'10.19.0', '12.15.0', '8.17.0', '6.17.1']
                     }
                 });
             });
@@ -320,7 +348,8 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['node']
+                        raw: ['node'],
+                        resolved: [/*'13.8.0'*/]
                     }
                 });
             });
@@ -340,7 +369,8 @@ describe('node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['latest']
+                        raw: ['latest'],
+                        resolved: [/*'13.8.0'*/]
                     }
                 });
             });
@@ -367,19 +397,6 @@ describe('node-support', () => {
 
         describe('repository', () => {
 
-            beforeEach(() => {
-
-                if (!Nock.isActive()) {
-                    Nock.activate();
-                }
-            });
-
-            afterEach(() => {
-
-                Nock.restore();
-                Nock.cleanAll();
-            });
-
             it('returns node versions from `.travis.yml` in the repository', async () => {
 
                 listRemoteStub
@@ -402,7 +419,8 @@ describe('node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13']
+                        raw: ['10', '12', '13'],
+                        resolved: ['10.19.0', '12.15.0', '13.8.0']
                     },
                     engines: '>=10'
                 });
@@ -454,19 +472,6 @@ describe('node-support', () => {
 
         describe('packageName', () => {
 
-            beforeEach(() => {
-
-                if (!Nock.isActive()) {
-                    Nock.activate();
-                }
-            });
-
-            afterEach(() => {
-
-                Nock.restore();
-                Nock.cleanAll();
-            });
-
             it('returns node versions from `.travis.yml` in the package repository', async () => {
 
                 listRemoteStub
@@ -493,7 +498,8 @@ describe('node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13']
+                        raw: ['10', '12', '13'],
+                        resolved: ['10.19.0', '12.15.0', '13.8.0']
                     },
                     engines: '>=10'
                 });
@@ -578,7 +584,8 @@ describe('node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13']
+                        raw: ['10', '12', '13'],
+                        resolved: ['10.19.0', '12.15.0', '13.8.0']
                     },
                     engines: '>=10'
                 });
