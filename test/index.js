@@ -375,6 +375,27 @@ describe('node-support', () => {
                 });
             });
 
+            it('handles invalid node versions', async () => {
+
+                const path = await internals.prepareFixture({
+                    travisYml: 'testing-invalid-version.yml'
+                });
+
+                const result = await NodeSupport.detect({ path });
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: 'test-module',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['i-am-not-a-node-version'],
+                        resolved: ['?']
+                    }
+                });
+            });
+
             it('throws when path is not a git repo', async () => {
 
                 const path = await internals.prepareFixture({ git: false });
