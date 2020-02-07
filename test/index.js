@@ -583,6 +583,25 @@ describe('node-support', () => {
                     engines: '>=10'
                 });
             });
+
+            it('throws when repo package name does not match', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/node-support/HEAD/package.json')
+                    .reply(200, JSON.stringify({ name: 'something-else' }))
+                    .get('/pkgjs/node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                Nock('https://registry.npmjs.org')
+                    .get('/node-support')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')));
+
+                await expect(NodeSupport.detect({ packageName: 'node-support' }))
+                    .to.reject('git+https://github.com/pkgjs/node-support.git does not contain node-support');
+            });
         });
     });
 });
