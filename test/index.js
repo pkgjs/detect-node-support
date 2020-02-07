@@ -181,7 +181,7 @@ describe('node-support', () => {
                     timestamp: 1580673602000,
                     travis: {
                         raw: ['latest'],
-                        resolved: [/*'13.8.0'*/]
+                        resolved: ['13.8.0']
                     }
                 });
             });
@@ -223,7 +223,7 @@ describe('node-support', () => {
                     timestamp: 1580673602000,
                     travis: {
                         raw: ['6', '8', '10', 'latest'],
-                        resolved: ['6.17.1', '8.17.0', '10.19.0']
+                        resolved: ['6.17.1', '8.17.0', '10.19.0', '13.8.0']
                     }
                 });
             });
@@ -307,7 +307,7 @@ describe('node-support', () => {
                     timestamp: 1580673602000,
                     travis: {
                         raw: ['6', '8', '9', '10', '12', 'stable'],
-                        resolved: ['6.17.1', '8.17.0', '9.11.2', '10.19.0', '12.15.0'/*, '13.8.0'*/]
+                        resolved: ['6.17.1', '8.17.0', '9.11.2', '10.19.0', '12.15.0', '13.8.0']
                     }
                 });
             });
@@ -328,7 +328,7 @@ describe('node-support', () => {
                     timestamp: 1580673602000,
                     travis: {
                         raw: ['node', '10', '12', '8', '6'],
-                        resolved: [/*'13.8.0', */'10.19.0', '12.15.0', '8.17.0', '6.17.1']
+                        resolved: ['13.8.0', '10.19.0', '12.15.0', '8.17.0', '6.17.1']
                     }
                 });
             });
@@ -349,7 +349,7 @@ describe('node-support', () => {
                     timestamp: 1580673602000,
                     travis: {
                         raw: ['node'],
-                        resolved: [/*'13.8.0'*/]
+                        resolved: ['13.8.0']
                     }
                 });
             });
@@ -370,7 +370,7 @@ describe('node-support', () => {
                     timestamp: 1580673602000,
                     travis: {
                         raw: ['latest'],
-                        resolved: [/*'13.8.0'*/]
+                        resolved: ['13.8.0']
                     }
                 });
             });
