@@ -56,31 +56,37 @@ Otherwise returns an object with:
 const result = {
 
     // the `name` field of the `package.json`
-    name: "package-name",    
+    "name": "package-name",    
     
     // the `version` field of the `package.json` when used with `path` / `repository`,
     // the `latest` dist-tag version when used with `package`
-    version: "0.0.0",
+    "version": "0.0.0",
 
     // the current time when the result is returned
-    timestamp: 1577115956099,
+    "timestamp": 1577115956099,
 
     // git commit hash of the repository HEAD at the time of scanning
-    commit: "2de28c8c4ab8ac998d403509123736929131908c",
+    "commit": "2de28c8c4ab8ac998d403509123736929131908c",
 
     // will be left out when not present in the `package.json`
     // a copy of the `engines.node` field from the `package.json` if present
-    engines: ">=x.y.z", 
+    "engines": ">=x.y.z", 
 
     // will be left out when `.travis.yml` file is not present
-    travis: {
+    "travis": {
         // the list of versions as detected by inspecting `node_js` / `matrix` configuration
         // will be an empty array when no versions are detected or the project is not a Node.js project
         // will contain "latest" when `language: node_js` specified, but no explicit versions detected
-        raw: ["8", "10", "lts/*"],
+        "raw": ["8", "10", "lts/*", "invalid-specifier"],
 
-        // raw version specifiers and keywords resolved to exact Node.js versions
-        resolved: ["8.17.0", "10.18.0", "12.14.0"]
+        // raw version specifiers and keywords (as keys) resolved to exact Node.js versions (as values)
+        // the value will be `false` when the specifier/keyword is unrecognized
+        "resolved": {
+            "8": "8.17.0", 
+            "10": "10.18.0", 
+            "lts/*": "12.14.0",
+            "invalid-specifier": false
+        }       
     }
 }
 ```
