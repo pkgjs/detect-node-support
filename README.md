@@ -81,6 +81,7 @@ const result = {
 
         // raw version specifiers and keywords (as keys) resolved to exact Node.js versions (as values)
         // the value will be `false` when the specifier/keyword is unrecognized
+        // will be an empty object when the `raw` array is empty
         "resolved": {
             "8": "8.17.0", 
             "10": "10.18.0", 
