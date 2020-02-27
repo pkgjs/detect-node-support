@@ -21,20 +21,20 @@
   },
   "homepage": "https://github.com/pkgjs/detect-node-support#readme",
   "devDependencies": {
-    "@hapi/code": "^7.0.0",
-    "@hapi/lab": "^21.0.0",
+    "@hapi/code": "^8.0.0",
+    "@hapi/lab": "^22.0.0",
     "allow-scripts": "^1.5.2",
-    "nock": "^11.7.2",
-    "semantic-release": "^15.14.0",
-    "sinon": "^8.1.1",
+    "nock": "^12.0.1",
+    "semantic-release": "^17.0.4",
+    "sinon": "^9.0.0",
     "tmp": "^0.1.0"
   },
   "dependencies": {
-    "@hapi/wreck": "^16.0.1",
+    "@hapi/wreck": "^17.0.0",
     "@pkgjs/nv": "0.0.3",
     "git-url-parse": "^11.1.2",
     "js-yaml": "^3.13.1",
-    "pacote": "^10.3.1",
+    "pacote": "^11.1.0",
     "simple-git": "^1.131.0"
   }
 }
