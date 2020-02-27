@@ -1,0 +1,10 @@
+# Source: https://github.com/shinnn/is-resolvable/blob/ad414e366d58ab47ae44099415fffac5d14b627a/.travis.yml#L1
+
+if: branch !~ ^v\d
+language: node_js
+node_js: node
+matrix:
+  include:
+  - after_script: node_modules/.bin/nyc report | npx coveralls
+  - os: windows
+    script: node test.js

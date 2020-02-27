@@ -1,0 +1,2 @@
+language: node_js
+node_js: "i-am-not-a-node-version"
