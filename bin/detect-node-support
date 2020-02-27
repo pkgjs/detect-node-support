@@ -9,12 +9,13 @@ const { URL } = require('url');
 
 const internals = {};
 
+internals.help = () => {
+
+    return `Usage: detect-node-support [ path | Github URL | npm package name ]`;
+};
+
 
 internals.autoDetect = (what) => {
-
-    if (!what) {
-        return NodeSupport.detect({ path: '.' });
-    }
 
     try {
         var url = new URL(what);
@@ -42,6 +43,11 @@ internals.autoDetect = (what) => {
 
 exports.main = async (nodeBin, thisBin, what) => {
 
+    if (!what) {
+        console.log(internals.help());
+        return;
+    }
+
     const result = await internals.autoDetect(what);
 
     console.log(result);
@@ -51,5 +57,6 @@ exports.main(...process.argv)
     .catch((err) => {
 
         console.error(err);
+        console.log(internals.help());
         process.exit(1);
     });
