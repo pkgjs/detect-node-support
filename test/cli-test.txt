@@ -1,7 +1,7 @@
 
 .
-node-support
+detect-node-support
 @hapi/hapi
-pkgjs/node-support
-https://github.com/pkgjs/node-support
-git+https://github.com/pkgjs/node-support.git
+pkgjs/detect-node-support
+https://github.com/pkgjs/detect-node-support
+git+https://github.com/pkgjs/detect-node-support.git
