@@ -1,25 +1,25 @@
 {
-  "name": "node-support",
+  "name": "detect-node-support",
   "version": "0.0.0-development",
   "description": "List the Node.js versions supported by the package/repository",
   "main": "lib/index.js",
   "scripts": {
-    "test-cli": " while read p; do echo \"./bin/node-support $p\"; ./bin/node-support $p; done < ./test/cli-test.txt",
-    "test": "lab -a @hapi/code -L -p 1 -t 100"
+    "test-cli": " while read p; do echo \"./bin/detect-node-support $p\"; ./bin/detect-node-support $p; done < ./test/cli-test.txt",
+    "test": "lab -a @hapi/code -L -p 1 -t 100 -m 5000"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pkgjs/node-support.git"
+    "url": "git+https://github.com/pkgjs/detect-node-support.git"
   },
   "author": "Dominykas Blyžė <hello@dominykas.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pkgjs/node-support/issues"
+    "url": "https://github.com/pkgjs/detect-node-support/issues"
   },
   "engines": {
     "node": ">=10"
   },
-  "homepage": "https://github.com/pkgjs/node-support#readme",
+  "homepage": "https://github.com/pkgjs/detect-node-support#readme",
   "devDependencies": {
     "@hapi/code": "^7.0.0",
     "@hapi/lab": "^21.0.0",

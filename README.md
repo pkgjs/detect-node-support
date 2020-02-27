@@ -1,11 +1,11 @@
-# node-support
+# detect-node-support
 
 List the Node.js versions supported by the package/repository
 
 ## Usage (command line)
 
 ```
-$ npx node-support [path]
+$ npx detect-node-support [path]
 ```
 
 Prints the supported Node.js versions for the package at the specified path. When the path is not a git repository - tries to read the git repository from `package.json` and tries to detect the versions listed in the repository as well.
@@ -13,13 +13,13 @@ Prints the supported Node.js versions for the package at the specified path. Whe
 When `path` is omitted, tries to detect the versions for `cwd`. 
 
 ```
-$ npx node-support [package name]
+$ npx detect-node-support [package name]
 ```
 
 Prints supported Node.js versions for the package from the registry.
 
 ```
-$ npx node-support [repository git URL]
+$ npx detect-node-support [repository git URL]
 ```
 
 Prints supported Node.js versions for the package at the git URL.
@@ -27,19 +27,19 @@ Prints supported Node.js versions for the package at the git URL.
 ## Usage (library)
 
 ```
-const result = await require('node-support').detect({ path });
+const result = await require('detect-node-support').detect({ path });
 ```
 
 `path` should be a folder in the local file system. When the path is not a git repository - tries to read the git repository from `package.json` and tries to detect the versions listed in the repository as well. 
 
 ```
-const result = await require('node-support').detect({ packageName });
+const result = await require('detect-node-support').detect({ packageName });
 ```
 
 `packageName` is a string name for the package in the registry. 
 
 ```
-const result = await require('node-support').detect({ repository });
+const result = await require('detect-node-support').detect({ repository });
 ```
 
 `repository` is a URL for a git repository.

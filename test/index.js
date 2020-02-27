@@ -55,7 +55,7 @@ internals.assertCommit = (result) => {
     delete result.commit;
 };
 
-describe('node-support', () => {
+describe('detect-node-support', () => {
 
     let listRemoteStub;
 
@@ -78,6 +78,8 @@ describe('node-support', () => {
         if (!Nock.isActive()) {
             Nock.activate();
         }
+
+        Nock.disableNetConnect();
 
         Nock('https://raw.githubusercontent.com')
             .persist()
@@ -103,6 +105,7 @@ describe('node-support', () => {
 
         Nock.restore();
         Nock.cleanAll();
+        Nock.enableNetConnect();
     });
 
     describe('detect()', () => {
@@ -118,7 +121,7 @@ describe('node-support', () => {
                 internals.assertCommit(result);
 
                 expect(result).to.equal({
-                    name: 'node-support',
+                    name: 'detect-node-support',
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
@@ -468,18 +471,18 @@ describe('node-support', () => {
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/node-support/HEAD/package.json')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/node-support/HEAD/.travis.yml')
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
 
-                const result = await NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/node-support.git' });
+                const result = await NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' });
 
                 expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/node-support.git', 'HEAD']]);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
 
                 expect(result).to.equal({
-                    name: 'node-support',
+                    name: 'detect-node-support',
                     version: '0.0.0-development',
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
@@ -501,24 +504,24 @@ describe('node-support', () => {
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/node-support/HEAD/package.json')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
                     .reply(404)
-                    .get('/pkgjs/node-support/HEAD/.travis.yml')
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
 
-                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/node-support.git' }))
-                    .to.reject(`git+https://github.com/pkgjs/node-support.git does not contain a package.json`);
+                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' }))
+                    .to.reject(`git+https://github.com/pkgjs/detect-node-support.git does not contain a package.json`);
             });
 
             it('rethrows server errors', async () => {
 
                 Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/node-support/HEAD/package.json')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
                     .reply(500)
-                    .get('/pkgjs/node-support/HEAD/.travis.yml')
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
 
-                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/node-support.git' }))
+                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' }))
                     .to.reject(/Response Error/);
             });
 
@@ -528,14 +531,14 @@ describe('node-support', () => {
 
                 Sinon.stub(Wreck, 'get').throws(err);
 
-                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/node-support.git' }))
+                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' }))
                     .to.reject('Something went wrong');
             });
 
             it('throws when a package does not live on public github.com', async () => {
 
-                await expect(NodeSupport.detect({ repository: 'git+https://github.example.com/pkgjs/node-support.git' }))
-                    .to.reject('Only github.com paths supported, feel free to PR at https://github.com/pkgjs/node-support');
+                await expect(NodeSupport.detect({ repository: 'git+https://github.example.com/pkgjs/detect-node-support.git' }))
+                    .to.reject('Only github.com paths supported, feel free to PR at https://github.com/pkgjs/detect-node-support');
             });
         });
 
@@ -547,22 +550,22 @@ describe('node-support', () => {
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/node-support/HEAD/package.json')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/node-support/HEAD/.travis.yml')
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
 
                 Nock('https://registry.npmjs.org')
-                    .get('/node-support')
+                    .get('/detect-node-support')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')));
 
-                const result = await NodeSupport.detect({ packageName: 'node-support' });
+                const result = await NodeSupport.detect({ packageName: 'detect-node-support' });
 
                 expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/node-support.git', 'HEAD']]);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
 
                 expect(result).to.equal({
-                    name: 'node-support',
+                    name: 'detect-node-support',
                     version: '0.0.0-development',
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
@@ -581,51 +584,55 @@ describe('node-support', () => {
             it('throws when package does not exist in the registry', async () => {
 
                 Nock('https://registry.npmjs.org')
-                    .get('/node-support')
+                    .get('/detect-node-support')
                     .reply(404);
 
-                await expect(NodeSupport.detect({ packageName: 'node-support' }))
-                    .to.reject(`Package node-support does not exist`);
+                await expect(NodeSupport.detect({ packageName: 'detect-node-support' }))
+                    .to.reject(`Package detect-node-support does not exist`);
             });
 
             it('rethrows registry server errors', async () => {
 
                 Nock('https://registry.npmjs.org')
-                    .get('/node-support')
+                    .get('/detect-node-support')
                     .reply(500);
 
-                await expect(NodeSupport.detect({ packageName: 'node-support' }))
+                await expect(NodeSupport.detect({ packageName: 'detect-node-support' }))
                     .to.reject(/Internal Server Error/);
             });
 
             it('rethrows generic errors', async () => {
 
+                Nock('https://registry.npmjs.org')
+                    .get('/detect-node-support')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')));
+
                 const err = new Error('Something went wrong');
 
                 Sinon.stub(Wreck, 'get').throws(err);
 
-                await expect(NodeSupport.detect({ packageName: 'node-support' }))
+                await expect(NodeSupport.detect({ packageName: 'detect-node-support' }))
                     .to.reject('Something went wrong');
             });
 
             it('throws when packument does not contain a `repository` field', async () => {
 
                 Nock('https://registry.npmjs.org')
-                    .get('/node-support')
-                    .reply(200, JSON.stringify({ name: 'node-support' }));
+                    .get('/detect-node-support')
+                    .reply(200, JSON.stringify({ name: 'detect-node-support' }));
 
-                await expect(NodeSupport.detect({ packageName: 'node-support' }))
-                    .to.reject('Unable to determine the git repository for node-support');
+                await expect(NodeSupport.detect({ packageName: 'detect-node-support' }))
+                    .to.reject('Unable to determine the git repository for detect-node-support');
             });
 
             it('throws when packument does not contain a `repository.url` field', async () => {
 
                 Nock('https://registry.npmjs.org')
-                    .get('/node-support')
-                    .reply(200, JSON.stringify({ name: 'node-support', repository: {} }));
+                    .get('/detect-node-support')
+                    .reply(200, JSON.stringify({ name: 'detect-node-support', repository: {} }));
 
-                await expect(NodeSupport.detect({ packageName: 'node-support' }))
-                    .to.reject('Unable to determine the git repository for node-support');
+                await expect(NodeSupport.detect({ packageName: 'detect-node-support' }))
+                    .to.reject('Unable to determine the git repository for detect-node-support');
             });
 
             it('returns node versions from `.travis.yml` in the package repository (string repository)', async () => {
@@ -634,25 +641,25 @@ describe('node-support', () => {
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/node-support/HEAD/package.json')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/node-support/HEAD/.travis.yml')
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
 
                 Nock('https://registry.npmjs.org')
-                    .get('/node-support')
+                    .get('/detect-node-support')
                     .reply(200, JSON.stringify({
-                        name: 'node-support',
-                        repository: 'git+https://github.com/pkgjs/node-support.git'
+                        name: 'detect-node-support',
+                        repository: 'git+https://github.com/pkgjs/detect-node-support.git'
                     }));
 
-                const result = await NodeSupport.detect({ packageName: 'node-support' });
+                const result = await NodeSupport.detect({ packageName: 'detect-node-support' });
 
                 expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/node-support.git', 'HEAD']]);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
 
                 expect(result).to.equal({
-                    name: 'node-support',
+                    name: 'detect-node-support',
                     version: '0.0.0-development',
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
@@ -674,17 +681,17 @@ describe('node-support', () => {
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/node-support/HEAD/package.json')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
                     .reply(200, JSON.stringify({ name: 'something-else' }))
-                    .get('/pkgjs/node-support/HEAD/.travis.yml')
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
 
                 Nock('https://registry.npmjs.org')
-                    .get('/node-support')
+                    .get('/detect-node-support')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')));
 
-                await expect(NodeSupport.detect({ packageName: 'node-support' }))
-                    .to.reject('git+https://github.com/pkgjs/node-support.git does not contain node-support');
+                await expect(NodeSupport.detect({ packageName: 'detect-node-support' }))
+                    .to.reject('git+https://github.com/pkgjs/detect-node-support.git does not contain detect-node-support');
             });
         });
     });
