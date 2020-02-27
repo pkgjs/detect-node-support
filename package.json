@@ -2,6 +2,9 @@
   "name": "detect-node-support",
   "version": "0.0.0-development",
   "description": "List the Node.js versions supported by the package/repository",
+  "bin": {
+    "detect-node-support": "./bin/detect-node-support"
+  },
   "files": [
     "bin",
     "lib"
