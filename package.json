@@ -2,6 +2,10 @@
   "name": "detect-node-support",
   "version": "0.0.0-development",
   "description": "List the Node.js versions supported by the package/repository",
+  "files": [
+    "bin",
+    "lib"
+  ],
   "main": "lib/index.js",
   "scripts": {
     "test-cli": " while read p; do echo \"./bin/detect-node-support $p\"; ./bin/detect-node-support $p; done < ./test/cli-test.txt",
