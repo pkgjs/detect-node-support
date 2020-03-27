@@ -5,7 +5,7 @@ List the Node.js versions supported by the package/repository
 ## Usage (command line)
 
 ```
-$ npx detect-node-support [path]
+$ npx detect-node-support [options] <path>
 ```
 
 Prints the supported Node.js versions for the package at the specified path. When the path is not a git repository - tries to read the git repository from `package.json` and tries to detect the versions listed in the repository as well.
@@ -13,36 +13,50 @@ Prints the supported Node.js versions for the package at the specified path. Whe
 When `path` is omitted, tries to detect the versions for `cwd`. 
 
 ```
-$ npx detect-node-support [package name]
+$ npx detect-node-support [options] <package name>
 ```
 
 Prints supported Node.js versions for the package from the registry.
 
 ```
-$ npx detect-node-support [repository git URL]
+$ npx detect-node-support [options] <repository git URL>
 ```
 
 Prints supported Node.js versions for the package at the git URL.
 
+### Options
+
+* `--deps` - include the support information of all dependencies
+
 ## Usage (library)
 
 ```
-const result = await require('detect-node-support').detect({ path });
+const result = await require('detect-node-support').detect({ path }, options);
 ```
 
 `path` should be a folder in the local file system. When the path is not a git repository - tries to read the git repository from `package.json` and tries to detect the versions listed in the repository as well. 
 
 ```
-const result = await require('detect-node-support').detect({ packageName });
+const result = await require('detect-node-support').detect({ packageName }, options);
 ```
 
 `packageName` is a string name for the package in the registry. 
 
 ```
-const result = await require('detect-node-support').detect({ repository });
+const result = await require('detect-node-support').detect({ repository }, options);
 ```
 
 `repository` is a URL for a git repository.
+
+```
+const result = await require('detect-node-support').detect(what, options);
+```
+
+`what` is a string containing either a package name, or a local path, or a reference to a git repository.
+
+### Options
+
+- `deps: false` - when `true`, include the support information of all dependencies.
 
 ### Result
 
@@ -87,6 +101,30 @@ const result = {
             "10": "10.18.0", 
             "lts/*": "12.14.0",
             "invalid-specifier": false
+        }       
+    },
+
+    // only present when explicitly requested
+    "dependencies": {
+
+        // will contain a support object for every unique dependency in the tree
+        // note that the `version` will be the _latest_ version available in the registry
+        // see below for the actual versions installed   
+        "support": [
+            { 
+                "name": "dependency-A" 
+                /*... other fields ...*/ 
+            },
+            { 
+                "name": "dependency-B" 
+                /*... other fields ...*/ 
+            }           
+        ],
+    
+        // will contain a list of unique versions for each dependency found in the dependency tree
+        "versions": {
+            "dependency-A": ["0.0.10", "1.2.5"],
+            "dependency-B": ["0.5.3", "1.0.0"]
         }       
     }
 }

@@ -2,28 +2,38 @@
 
 'use strict';
 
+const Minimist = require('minimist');
+
 const NodeSupport = require('..');
 
 const internals = {};
 
 internals.help = () => {
 
-    return `Usage: detect-node-support [ path | Github URL | npm package name ]`;
+    return `
+Usage: detect-node-support [--deps] <what>
+
+  <what> can be an npm package name, or a Github URL, or a path 
+  with a package.json.
+
+Options:
+  --deps    Include the support information of all dependencies
+`;
 };
 
-exports.main = async ([nodeBin, thisBin, what]) => {
+exports.main = async ({ _: [what], deps }) => {
 
     if (!what) {
         console.log(internals.help());
         return;
     }
 
-    const result = await NodeSupport.detect(what);
+    const result = await NodeSupport.detect(what, { deps });
 
     console.log(result);
 };
 
-exports.main(process.argv)
+exports.main(Minimist(process.argv.slice(2), { boolean: 'deps' }))
     .catch((err) => {
 
         console.error(err);
