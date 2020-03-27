@@ -2,10 +2,7 @@
 
 'use strict';
 
-const Fs = require('fs');
 const NodeSupport = require('..');
-const { URL } = require('url');
-
 
 const internals = {};
 
@@ -14,46 +11,19 @@ internals.help = () => {
     return `Usage: detect-node-support [ path | Github URL | npm package name ]`;
 };
 
-
-internals.autoDetect = (what) => {
-
-    try {
-        var url = new URL(what);
-    }
-    catch (err) {
-        if (err.code !== 'ERR_INVALID_URL') {
-            throw err;
-        }
-    }
-
-    if (url) {
-        return NodeSupport.detect({ repository: url.href });
-    }
-
-    if (Fs.existsSync(what)) {
-        return NodeSupport.detect({ path: what });
-    }
-
-    if (what.includes('/') && !what.startsWith('@')) {
-        return  NodeSupport.detect({ repository: `https://github.com/${what}` });
-    }
-
-    return NodeSupport.detect({ packageName: what });
-};
-
-exports.main = async (nodeBin, thisBin, what) => {
+exports.main = async ([nodeBin, thisBin, what]) => {
 
     if (!what) {
         console.log(internals.help());
         return;
     }
 
-    const result = await internals.autoDetect(what);
+    const result = await NodeSupport.autoDetect(what);
 
     console.log(result);
 };
 
-exports.main(...process.argv)
+exports.main(process.argv)
     .catch((err) => {
 
         console.error(err);
