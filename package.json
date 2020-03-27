@@ -37,11 +37,13 @@
   },
   "dependencies": {
     "@hapi/wreck": "^17.0.0",
+    "@npmcli/arborist": "0.0.0-pre.13",
     "@pkgjs/nv": "0.0.3",
     "git-url-parse": "^11.1.2",
     "js-yaml": "^3.13.1",
     "minimist": "^1.2.5",
     "pacote": "^11.1.0",
-    "simple-git": "^1.131.0"
+    "simple-git": "^1.131.0",
+    "tempy": "^0.5.0"
   }
 }
