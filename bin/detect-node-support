@@ -18,7 +18,7 @@ exports.main = async ([nodeBin, thisBin, what]) => {
         return;
     }
 
-    const result = await NodeSupport.autoDetect(what);
+    const result = await NodeSupport.detect(what);
 
     console.log(result);
 };
