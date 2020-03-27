@@ -32,7 +32,6 @@
     "@hapi/lab": "^22.0.0",
     "allow-scripts": "^1.5.2",
     "nock": "^12.0.1",
-    "semantic-release": "^17.0.4",
     "sinon": "^9.0.0",
     "tmp": "^0.1.0"
   },

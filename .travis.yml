@@ -12,15 +12,3 @@ cache:
 install:
   - "npm install --ignore-scripts"
   - "npx allow-scripts"
-
-#@todo uncomment before v1
-#jobs:
-#  include:
-#    - stage: release
-#      if: branch = master AND type = push
-#      node_js: "12"
-#      deploy:
-#        provider: "script"
-#        skip_cleanup: true
-#        script:
-#          - "npx semantic-release"
