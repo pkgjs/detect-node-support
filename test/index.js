@@ -762,7 +762,7 @@ describe('detect-node-support', () => {
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')));
 
                 await expect(NodeSupport.detect({ packageName: 'detect-node-support' }))
-                    .to.reject('git+https://github.com/pkgjs/detect-node-support.git does not contain detect-node-support');
+                    .to.reject('git+https://github.com/pkgjs/detect-node-support.git does not contain detect-node-support. Monorepo not supported: https://github.com/pkgjs/detect-node-support/issues/6');
             });
         });
 
