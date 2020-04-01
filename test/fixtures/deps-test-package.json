@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "dependencies": {
+    "is-ci": "^2.0.0",
+    "ci-info": "^1.6.0"
+  }
+}

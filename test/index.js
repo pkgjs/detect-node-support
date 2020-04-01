@@ -762,7 +762,173 @@ describe('detect-node-support', () => {
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')));
 
                 await expect(NodeSupport.detect({ packageName: 'detect-node-support' }))
-                    .to.reject('git+https://github.com/pkgjs/detect-node-support.git does not contain detect-node-support');
+                    .to.reject('git+https://github.com/pkgjs/detect-node-support.git does not contain detect-node-support. Monorepo not supported: https://github.com/pkgjs/detect-node-support/issues/6');
+            });
+        });
+
+        describe('string (auto-detect)', () => {
+
+            it('returns node versions from `.travis.yml` at the path', async () => {
+
+                const path = Path.join(__dirname, '..');
+
+                const result = await NodeSupport.detect(path);
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: 'detect-node-support',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '13'],
+                        resolved: {
+                            '10': '10.19.0',
+                            '12': '12.15.0',
+                            '13': '13.8.0'
+                        }
+                    },
+                    engines: '>=10'
+                });
+            });
+
+            it('returns node versions from `.travis.yml` in the repository (url case)', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                const result = await NodeSupport.detect('git+https://github.com/pkgjs/detect-node-support.git');
+
+                expect(listRemoteStub.callCount).to.equal(1);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
+
+                expect(result).to.equal({
+                    name: 'detect-node-support',
+                    version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '13'],
+                        resolved: {
+                            '10': '10.19.0',
+                            '12': '12.15.0',
+                            '13': '13.8.0'
+                        }
+                    },
+                    engines: '>=10'
+                });
+            });
+
+            it('returns node versions from `.travis.yml` in the repository ("org/repo" case)', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                const result = await NodeSupport.detect('pkgjs/detect-node-support');
+
+                expect(listRemoteStub.callCount).to.equal(1);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support', 'HEAD']]);
+
+                expect(result).to.equal({
+                    name: 'detect-node-support',
+                    version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '13'],
+                        resolved: {
+                            '10': '10.19.0',
+                            '12': '12.15.0',
+                            '13': '13.8.0'
+                        }
+                    },
+                    engines: '>=10'
+                });
+            });
+
+            it('returns node versions from `.travis.yml` in the package repository', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                Nock('https://registry.npmjs.org')
+                    .get('/detect-node-support')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')));
+
+                const result = await NodeSupport.detect('detect-node-support');
+
+                expect(listRemoteStub.callCount).to.equal(1);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
+
+                expect(result).to.equal({
+                    name: 'detect-node-support',
+                    version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '13'],
+                        resolved: {
+                            '10': '10.19.0',
+                            '12': '12.15.0',
+                            '13': '13.8.0'
+                        }
+                    },
+                    engines: '>=10'
+                });
+            });
+
+            it('returns node versions from `.travis.yml` in the package repository (scoped)', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/hapijs/hapi/HEAD/package.json')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'hapi-package.json')))
+                    .get('/hapijs/hapi/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                Nock('https://registry.npmjs.org')
+                    .get('/@hapi%2fhapi')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'hapi-package.json')));
+
+                const result = await NodeSupport.detect('@hapi/hapi');
+
+                expect(listRemoteStub.callCount).to.equal(1);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/hapijs/hapi.git', 'HEAD']]);
+
+                expect(result).to.equal({
+                    name: '@hapi/hapi',
+                    version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '13'],
+                        resolved: {
+                            '10': '10.19.0',
+                            '12': '12.15.0',
+                            '13': '13.8.0'
+                        }
+                    }
+                });
             });
         });
     });
