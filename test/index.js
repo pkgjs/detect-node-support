@@ -63,8 +63,10 @@ describe('detect-node-support', () => {
 
         listRemoteStub = Sinon.stub().throws();
 
-        Sinon.stub(Date, 'now')
-            .returns(+new Date('2020-02-02T20:00:02Z'));
+        Sinon.useFakeTimers({
+            now: +new Date('2020-02-02T20:00:02Z'),
+            toFake: ['Date']
+        });
 
         Sinon.stub(Utils, 'simpleGit').callsFake((...args) => {
 
