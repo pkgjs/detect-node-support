@@ -2,12 +2,19 @@
 
 'use strict';
 
+const Debug = require('debug');
+const Fs = require('fs');
 const Minimist = require('minimist');
+const Tmp = require('tmp');
 const Util = require('util');
 
 const NodeSupport = require('..');
 
 const internals = {};
+
+
+internals.log = Debug('detect-node-support');
+
 
 internals.help = () => {
 
@@ -40,11 +47,16 @@ exports.main = async ({ _: [what], deps, deep, dev, json }) => {
 
     const result = await NodeSupport.detect(what, { deps, deep, dev });
 
+    const jsonOutput = JSON.stringify(result, null, '  ');
+    const tmpFile = Tmp.fileSync({ postfix: '.json' });
+    Fs.writeFileSync(tmpFile.name, jsonOutput);
+
     if (json) {
-        console.log(JSON.stringify(result, null, '  '));
+        console.log(jsonOutput);
     }
     else {
         console.log(Util.inspect(result, false, null, true));
+        console.log(`Full output available in ${tmpFile.name}`);
     }
 };
 
