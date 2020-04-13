@@ -931,5 +931,77 @@ describe('detect-node-support', () => {
                 });
             });
         });
+
+        describe('with dependencies', () => {
+
+            it('resolves dependency information', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://registry.npmjs.org')
+                    .get('/is-ci')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'packuments', 'is-ci.json')))
+                    .get('/ci-info')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'packuments', 'ci-info.json')))
+                    .get('/debug')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'packuments', 'debug.json')))
+                    .get('/ms')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'packuments', 'ms.json')))
+                    .persist();
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/watson/is-ci/HEAD/package.json')
+                    .reply(200, JSON.stringify({ name: 'is-ci', version: '2.0.0' }))
+                    .get('/watson/is-ci/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'testing-single-version.yml')))
+                    .get('/watson/ci-info/HEAD/package.json')
+                    .reply(200, JSON.stringify({ name: 'ci-info', version: '2.0.0' }))
+                    .get('/watson/ci-info/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'testing-single-version.yml')));
+
+                const path = await internals.prepareFixture({
+                    packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString())
+                });
+
+                const result = await NodeSupport.detect({ path }, { deps: true });
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: '@pkgjs/detect-node-support-deps-test',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    dependencies: {
+                        versions: {
+                            'ci-info': ['1.6.0'],
+                            'is-ci': ['2.0.0']
+                        },
+                        support: [
+                            {
+                                name: 'ci-info',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            },
+                            {
+                                name: 'is-ci',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            }
+                        ]
+                    }
+                });
+            });
+        });
     });
 });
