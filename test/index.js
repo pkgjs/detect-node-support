@@ -453,6 +453,32 @@ describe('detect-node-support', () => {
                 });
             });
 
+            it('handles duplicate key in .travis.yml', async () => {
+
+                const path = await internals.prepareFixture({
+                    travisYml: 'npm-promzard.yml'
+                });
+
+                const result = await NodeSupport.detect({ path });
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: 'test-module',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['0.8', '0.10', '0.12', 'iojs'],
+                        resolved: {
+                            '0.8': '0.8.28',
+                            '0.10': '0.10.48',
+                            '0.12': '0.12.18',
+                            'iojs': false
+                        }
+                    }
+                });
+            });
+
             it('throws when path is not a git repo', async () => {
 
                 const path = await internals.prepareFixture({ git: false });
