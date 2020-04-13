@@ -26,9 +26,9 @@ Prints supported Node.js versions for the package at the git URL.
 
 ### Options
 
-* `--deep` - when used with --deps, include direct dev dependencies
+* `--deep` - when used with --deps, include indirect dependencies
 * `--deps` - include the support information of direct production dependencies
-* `--dev` - when used with --deps, include indirect dependencies
+* `--dev` - when used with --deps, include dev dependencies
 
 ## Usage (library)
 
@@ -58,7 +58,9 @@ const result = await require('detect-node-support').detect(what, options);
 
 ### Options
 
+- `deep: false` - when `true` and used `deps: true`, include indirect dependencies
 - `deps: false` - when `true`, include the support information of all dependencies.
+- `dev: false` - when `true` and used with `deps: true`, include dev dependencies
 
 ### Result
 
