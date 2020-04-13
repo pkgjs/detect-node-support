@@ -5,6 +5,6 @@
     "ci-info": "^1.6.0"
   },
   "devDependencies": {
-    "ms": "^2.1.2"
+    "debug": "^4.1.1"
   }
 }

@@ -36,6 +36,7 @@ describe('Deps', () => {
             expect(result).to.equal({
                 'ci-info': ['1.6.0', '2.0.0'],
                 'is-ci': ['2.0.0'],
+                'debug': ['4.1.1'],
                 'ms': ['2.1.2']
             });
         });
@@ -50,7 +51,7 @@ describe('Deps', () => {
             expect(result).to.equal({
                 'ci-info': ['1.6.0'],
                 'is-ci': ['2.0.0'],
-                'ms': ['2.1.2']
+                'debug': ['4.1.1']
             });
         });
 
