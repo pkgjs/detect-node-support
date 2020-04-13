@@ -26,7 +26,9 @@ Prints supported Node.js versions for the package at the git URL.
 
 ### Options
 
-* `--deps` - include the support information of all dependencies
+* `--deep` - when used with --deps, include direct dev dependencies
+* `--deps` - include the support information of direct production dependencies
+* `--dev` - when used with --deps, include indirect dependencies
 
 ## Usage (library)
 
