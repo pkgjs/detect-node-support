@@ -126,7 +126,16 @@ const result = {
         // will contain a list of unique versions for each dependency found in the dependency tree
         "versions": {
             "dependency-A": ["0.0.10", "1.2.5"],
-            "dependency-B": ["0.5.3", "1.0.0"]
+            "dependency-B": ["0.5.3", "1.0.0"],
+            "dependency-C": ["7.8.9"]
+        },
+        
+        // will contain a list of errors that were encountered while resolving dependency support information
+        "errors": {
+            "dependency-C": {
+                // the `message` will always be either a string or `null`
+                "message": "Failed to download some information or something"
+            }       
         }       
     }
 }

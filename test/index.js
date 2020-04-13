@@ -948,15 +948,17 @@ describe('detect-node-support', () => {
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://registry.npmjs.org')
+                    .persist()
                     .get('/is-ci')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'packuments', 'is-ci.json')))
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'packuments', 'is-ci.json')))
                     .get('/ci-info')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'packuments', 'ci-info.json')))
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'packuments', 'ci-info.json')))
                     .get('/debug')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'packuments', 'debug.json')))
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'packuments', 'debug.json')))
                     .get('/ms')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'packuments', 'ms.json')))
-                    .persist();
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'packuments', 'ms.json')))
+                    .get('/rimraf')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'packuments', 'rimraf.json')));
 
                 Nock('https://raw.githubusercontent.com')
                     .get('/watson/is-ci/HEAD/package.json')
@@ -974,6 +976,8 @@ describe('detect-node-support', () => {
                     .get('/zeit/ms/HEAD/package.json')
                     .reply(200, JSON.stringify({ name: 'ms', version: '2.1.2' }))
                     .get('/zeit/ms/HEAD/.travis.yml')
+                    .reply(404)
+                    .get('/isaacs/rimraf/HEAD/package.json')
                     .reply(404);
             });
 
@@ -1269,6 +1273,52 @@ describe('detect-node-support', () => {
                                 }
                             }
                         ]
+                    }
+                });
+            });
+
+            it('rethrows lock file parsing errors', async () => {
+
+                const path = await internals.prepareFixture({
+                    packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
+                    packageLockJson: 'testing-single-version.yml'
+                });
+
+                await expect(NodeSupport.detect({ path }, { deps: true })).to.reject('Unexpected token l in JSON at position 0');
+            });
+
+            it('handles failures to load packages', async () => {
+
+                Sinon.stub(console, 'warn');
+
+                const path = await internals.prepareFixture({
+                    packageJson: {
+                        name: '@pkgjs/detect-node-support-deps-test',
+                        version: '0.0.0-development',
+                        dependencies: {
+                            rimraf: '1.x'
+                        }
+                    }
+                });
+
+                const result = await NodeSupport.detect({ path }, { deps: true });
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: '@pkgjs/detect-node-support-deps-test',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    dependencies: {
+                        support: [],
+                        versions: {
+                            rimraf: ['1.0.9']
+                        },
+                        errors: {
+                            rimraf: {
+                                message: 'git://github.com/isaacs/rimraf.git does not contain a package.json'
+                            }
+                        }
                     }
                 });
             });
