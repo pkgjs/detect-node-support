@@ -1,0 +1,12 @@
+{
+  "name": "@pkgjs/detect-node-support-deps-test",
+  "version": "0.0.0-development",
+  "private": true,
+  "dependencies": {
+    "is-ci": "^2.0.0",
+    "ci-info": "^1.6.0"
+  },
+  "devDependencies": {
+    "debug": "^4.1.1"
+  }
+}
