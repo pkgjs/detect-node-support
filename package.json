@@ -32,15 +32,18 @@
     "@hapi/lab": "^22.0.0",
     "allow-scripts": "^1.5.2",
     "nock": "^12.0.1",
-    "sinon": "^9.0.0",
-    "tmp": "^0.1.0"
+    "sinon": "^9.0.0"
   },
   "dependencies": {
     "@hapi/wreck": "^17.0.0",
+    "@npmcli/arborist": "0.0.0-pre.14",
     "@pkgjs/nv": "0.0.3",
+    "debug": "^4.1.1",
     "git-url-parse": "^11.1.2",
     "js-yaml": "^3.13.1",
+    "minimist": "^1.2.5",
     "pacote": "^11.1.0",
-    "simple-git": "^1.131.0"
+    "simple-git": "^1.131.0",
+    "tmp": "^0.1.0"
   }
 }

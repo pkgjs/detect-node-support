@@ -21,7 +21,7 @@ const internals = {
     tmpObjects: []
 };
 
-internals.prepareFixture = async ({ travisYml, packageJson, git = true } = {}) => {
+internals.prepareFixture = async ({ travisYml, packageJson, npmShrinkwrapJson, packageLockJson, git = true } = {}) => {
 
     const tmpObj = Tmp.dirSync({ unsafeCleanup: true });
 
@@ -36,6 +36,14 @@ internals.prepareFixture = async ({ travisYml, packageJson, git = true } = {}) =
             name: 'test-module',
             version: '0.0.0-development'
         }));
+    }
+
+    if (npmShrinkwrapJson) {
+        Fs.copyFileSync(Path.join(__dirname, 'fixtures', npmShrinkwrapJson), Path.join(tmpObj.name, 'npm-shrinkwrap.json'));
+    }
+
+    if (packageLockJson) {
+        Fs.copyFileSync(Path.join(__dirname, 'fixtures', packageLockJson), Path.join(tmpObj.name, 'package-lock.json'));
     }
 
     if (git) {
@@ -445,6 +453,32 @@ describe('detect-node-support', () => {
                 });
             });
 
+            it('handles duplicate key in .travis.yml', async () => {
+
+                const path = await internals.prepareFixture({
+                    travisYml: 'npm-promzard.yml'
+                });
+
+                const result = await NodeSupport.detect({ path });
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: 'test-module',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['0.8', '0.10', '0.12', 'iojs'],
+                        resolved: {
+                            '0.8': '0.8.28',
+                            '0.10': '0.10.48',
+                            '0.12': '0.12.18',
+                            'iojs': false
+                        }
+                    }
+                });
+            });
+
             it('throws when path is not a git repo', async () => {
 
                 const path = await internals.prepareFixture({ git: false });
@@ -762,7 +796,557 @@ describe('detect-node-support', () => {
                     .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')));
 
                 await expect(NodeSupport.detect({ packageName: 'detect-node-support' }))
-                    .to.reject('git+https://github.com/pkgjs/detect-node-support.git does not contain detect-node-support');
+                    .to.reject('git+https://github.com/pkgjs/detect-node-support.git does not contain detect-node-support. Monorepo not supported: https://github.com/pkgjs/detect-node-support/issues/6');
+            });
+        });
+
+        describe('string (auto-detect)', () => {
+
+            it('returns node versions from `.travis.yml` at the path', async () => {
+
+                const path = Path.join(__dirname, '..');
+
+                const result = await NodeSupport.detect(path);
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: 'detect-node-support',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '13'],
+                        resolved: {
+                            '10': '10.19.0',
+                            '12': '12.15.0',
+                            '13': '13.8.0'
+                        }
+                    },
+                    engines: '>=10'
+                });
+            });
+
+            it('returns node versions from `.travis.yml` in the repository (url case)', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                const result = await NodeSupport.detect('git+https://github.com/pkgjs/detect-node-support.git');
+
+                expect(listRemoteStub.callCount).to.equal(1);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
+
+                expect(result).to.equal({
+                    name: 'detect-node-support',
+                    version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '13'],
+                        resolved: {
+                            '10': '10.19.0',
+                            '12': '12.15.0',
+                            '13': '13.8.0'
+                        }
+                    },
+                    engines: '>=10'
+                });
+            });
+
+            it('returns node versions from `.travis.yml` in the repository ("org/repo" case)', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                const result = await NodeSupport.detect('pkgjs/detect-node-support');
+
+                expect(listRemoteStub.callCount).to.equal(1);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support', 'HEAD']]);
+
+                expect(result).to.equal({
+                    name: 'detect-node-support',
+                    version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '13'],
+                        resolved: {
+                            '10': '10.19.0',
+                            '12': '12.15.0',
+                            '13': '13.8.0'
+                        }
+                    },
+                    engines: '>=10'
+                });
+            });
+
+            it('returns node versions from `.travis.yml` in the package repository', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                Nock('https://registry.npmjs.org')
+                    .get('/detect-node-support')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')));
+
+                const result = await NodeSupport.detect('detect-node-support');
+
+                expect(listRemoteStub.callCount).to.equal(1);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
+
+                expect(result).to.equal({
+                    name: 'detect-node-support',
+                    version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '13'],
+                        resolved: {
+                            '10': '10.19.0',
+                            '12': '12.15.0',
+                            '13': '13.8.0'
+                        }
+                    },
+                    engines: '>=10'
+                });
+            });
+
+            it('returns node versions from `.travis.yml` in the package repository (scoped)', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/hapijs/hapi/HEAD/package.json')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'hapi-package.json')))
+                    .get('/hapijs/hapi/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                Nock('https://registry.npmjs.org')
+                    .get('/@hapi%2fhapi')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'hapi-package.json')));
+
+                const result = await NodeSupport.detect('@hapi/hapi');
+
+                expect(listRemoteStub.callCount).to.equal(1);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/hapijs/hapi.git', 'HEAD']]);
+
+                expect(result).to.equal({
+                    name: '@hapi/hapi',
+                    version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '13'],
+                        resolved: {
+                            '10': '10.19.0',
+                            '12': '12.15.0',
+                            '13': '13.8.0'
+                        }
+                    }
+                });
+            });
+        });
+
+        describe('with dependencies', () => {
+
+            beforeEach(() => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://registry.npmjs.org')
+                    .persist()
+                    .get('/is-ci')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'packuments', 'is-ci.json')))
+                    .get('/ci-info')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'packuments', 'ci-info.json')))
+                    .get('/debug')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'packuments', 'debug.json')))
+                    .get('/ms')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'packuments', 'ms.json')))
+                    .get('/rimraf')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'packuments', 'rimraf.json')));
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/watson/is-ci/HEAD/package.json')
+                    .reply(200, JSON.stringify({ name: 'is-ci', version: '2.0.0' }))
+                    .get('/watson/is-ci/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'testing-single-version.yml')))
+                    .get('/watson/ci-info/HEAD/package.json')
+                    .reply(200, JSON.stringify({ name: 'ci-info', version: '2.0.0' }))
+                    .get('/watson/ci-info/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'testing-single-version.yml')))
+                    .get('/visionmedia/debug/HEAD/package.json')
+                    .reply(200, JSON.stringify({ name: 'debug', version: '4.1.1' }))
+                    .get('/visionmedia/debug/HEAD/.travis.yml')
+                    .reply(404)
+                    .get('/zeit/ms/HEAD/package.json')
+                    .reply(200, JSON.stringify({ name: 'ms', version: '2.1.2' }))
+                    .get('/zeit/ms/HEAD/.travis.yml')
+                    .reply(404)
+                    .get('/isaacs/rimraf/HEAD/package.json')
+                    .reply(404);
+            });
+
+            it('resolves direct prod dep information', async () => {
+
+                const path = await internals.prepareFixture({
+                    packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString())
+                });
+
+                const result = await NodeSupport.detect({ path }, { deps: true });
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: '@pkgjs/detect-node-support-deps-test',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    dependencies: {
+                        versions: {
+                            'ci-info': ['1.6.0'],
+                            'is-ci': ['2.0.0']
+                        },
+                        support: [
+                            {
+                                name: 'ci-info',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            },
+                            {
+                                name: 'is-ci',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            }
+                        ]
+                    }
+                });
+            });
+
+            it('resolves deps from shrinkwrap', async () => {
+
+                const path = await internals.prepareFixture({
+                    packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
+                    npmShrinkwrapJson: 'deps-test/npm-shrinkwrap.json'
+                });
+
+                const result = await NodeSupport.detect({ path }, { deps: true });
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: '@pkgjs/detect-node-support-deps-test',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    dependencies: {
+                        versions: {
+                            'ci-info': ['1.6.0'],
+                            'is-ci': ['2.0.0']
+                        },
+                        support: [
+                            {
+                                name: 'ci-info',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            },
+                            {
+                                name: 'is-ci',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            }
+                        ]
+                    }
+                });
+            });
+
+            it('resolves deps from package-lock', async () => {
+
+                const path = await internals.prepareFixture({
+                    packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
+                    packageLockJson: 'deps-test/npm-shrinkwrap.json'
+                });
+
+                const result = await NodeSupport.detect({ path }, { deps: true });
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: '@pkgjs/detect-node-support-deps-test',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    dependencies: {
+                        versions: {
+                            'ci-info': ['1.6.0'],
+                            'is-ci': ['2.0.0']
+                        },
+                        support: [
+                            {
+                                name: 'ci-info',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            },
+                            {
+                                name: 'is-ci',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            }
+                        ]
+                    }
+                });
+            });
+
+            it('resolves all deps', async () => {
+
+                const path = await internals.prepareFixture({
+                    packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
+                    npmShrinkwrapJson: 'deps-test/npm-shrinkwrap.json'
+                });
+
+                const result = await NodeSupport.detect({ path }, { deps: true, deep: true, dev: true });
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: '@pkgjs/detect-node-support-deps-test',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    dependencies: {
+                        versions: {
+                            'ci-info': ['1.6.0', '2.0.0'],
+                            'is-ci': ['2.0.0'],
+                            debug: ['4.1.1'],
+                            ms: ['2.1.2']
+                        },
+                        support: [
+                            {
+                                name: 'ci-info',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            },
+                            {
+                                name: 'debug',
+                                version: '4.1.1',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23'
+                            },
+                            {
+                                name: 'is-ci',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            },
+                            {
+                                name: 'ms',
+                                version: '2.1.2',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23'
+                            }
+                        ]
+                    }
+                });
+            });
+
+            it('resolves direct deps', async () => {
+
+                const path = await internals.prepareFixture({
+                    packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
+                    npmShrinkwrapJson: 'deps-test/npm-shrinkwrap.json'
+                });
+
+                const result = await NodeSupport.detect({ path }, { deps: true, dev: true });
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: '@pkgjs/detect-node-support-deps-test',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    dependencies: {
+                        versions: {
+                            'ci-info': ['1.6.0'],
+                            'is-ci': ['2.0.0'],
+                            debug: ['4.1.1']
+                        },
+                        support: [
+                            {
+                                name: 'ci-info',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            },
+                            {
+                                name: 'debug',
+                                version: '4.1.1',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23'
+                            },
+                            {
+                                name: 'is-ci',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            }
+                        ]
+                    }
+                });
+            });
+
+            it('resolves all prod deps', async () => {
+
+                const path = await internals.prepareFixture({
+                    packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
+                    npmShrinkwrapJson: 'deps-test/npm-shrinkwrap.json'
+                });
+
+                const result = await NodeSupport.detect({ path }, { deps: true, deep: true });
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: '@pkgjs/detect-node-support-deps-test',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    dependencies: {
+                        versions: {
+                            'ci-info': ['1.6.0', '2.0.0'],
+                            'is-ci': ['2.0.0']
+                        },
+                        support: [
+                            {
+                                name: 'ci-info',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            },
+                            {
+                                name: 'is-ci',
+                                version: '2.0.0',
+                                timestamp: 1580673602000,
+                                commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                                travis: {
+                                    raw: ['10'],
+                                    resolved: { '10': '10.19.0' }
+                                }
+                            }
+                        ]
+                    }
+                });
+            });
+
+            it('rethrows lock file parsing errors', async () => {
+
+                const path = await internals.prepareFixture({
+                    packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
+                    packageLockJson: 'testing-single-version.yml'
+                });
+
+                await expect(NodeSupport.detect({ path }, { deps: true })).to.reject('Unexpected token l in JSON at position 0');
+            });
+
+            it('handles failures to load packages', async () => {
+
+                Sinon.stub(console, 'warn');
+
+                const path = await internals.prepareFixture({
+                    packageJson: {
+                        name: '@pkgjs/detect-node-support-deps-test',
+                        version: '0.0.0-development',
+                        dependencies: {
+                            rimraf: '1.x'
+                        }
+                    }
+                });
+
+                const result = await NodeSupport.detect({ path }, { deps: true });
+
+                internals.assertCommit(result);
+
+                expect(result).to.equal({
+                    name: '@pkgjs/detect-node-support-deps-test',
+                    version: '0.0.0-development',
+                    timestamp: 1580673602000,
+                    dependencies: {
+                        support: [],
+                        versions: {
+                            rimraf: ['1.0.9']
+                        },
+                        errors: {
+                            rimraf: {
+                                message: 'git://github.com/isaacs/rimraf.git does not contain a package.json'
+                            }
+                        }
+                    }
+                });
             });
         });
     });
