@@ -28,7 +28,7 @@ internals.prepareFixture = async ({ travisYml, packageJson, npmShrinkwrapJson, p
     internals.tmpObjects.push(tmpObj);
 
     if (travisYml) {
-        Fs.copyFileSync(Path.join(__dirname, 'fixtures', travisYml), Path.join(tmpObj.name, '.travis.yml'));
+        Fs.copyFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', travisYml), Path.join(tmpObj.name, '.travis.yml'));
     }
 
     if (packageJson !== false) {
@@ -990,11 +990,11 @@ describe('detect-node-support', () => {
                     .get('/watson/is-ci/HEAD/package.json')
                     .reply(200, JSON.stringify({ name: 'is-ci', version: '2.0.0' }))
                     .get('/watson/is-ci/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'testing-single-version.yml')))
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-single-version.yml')))
                     .get('/watson/ci-info/HEAD/package.json')
                     .reply(200, JSON.stringify({ name: 'ci-info', version: '2.0.0' }))
                     .get('/watson/ci-info/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'testing-single-version.yml')))
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-single-version.yml')))
                     .get('/visionmedia/debug/HEAD/package.json')
                     .reply(200, JSON.stringify({ name: 'debug', version: '4.1.1' }))
                     .get('/visionmedia/debug/HEAD/.travis.yml')
@@ -1307,7 +1307,7 @@ describe('detect-node-support', () => {
 
                 const path = await internals.prepareFixture({
                     packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
-                    packageLockJson: 'testing-single-version.yml'
+                    packageLockJson: 'travis-ymls/testing-single-version.yml' // not a json file
                 });
 
                 await expect(NodeSupport.detect({ path }, { deps: true })).to.reject('Unexpected token l in JSON at position 0');
