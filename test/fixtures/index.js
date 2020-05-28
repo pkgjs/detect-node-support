@@ -89,7 +89,11 @@ module.exports = class TestContext {
 
         if (partials) {
             Fs.mkdirSync(Path.join(this.path, 'partials'));
-            for (const fn of ['node-14.yml']) {
+            const partialYmls = [
+                'indirect-node-14.yml',
+                'node-14.yml'
+            ];
+            for (const fn of partialYmls) {
                 Fs.copyFileSync(Path.join(__dirname, 'travis-ymls', 'testing-imports', 'partials', fn), Path.join(this.path, 'partials', fn));
             }
         }
