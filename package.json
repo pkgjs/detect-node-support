@@ -36,14 +36,14 @@
   },
   "dependencies": {
     "@hapi/wreck": "^17.0.0",
-    "@npmcli/arborist": "0.0.0-pre.14",
+    "@npmcli/arborist": "0.0.0-pre.19",
     "@pkgjs/nv": "0.0.3",
     "debug": "^4.1.1",
     "git-url-parse": "^11.1.2",
     "js-yaml": "^3.13.1",
     "minimist": "^1.2.5",
     "pacote": "^11.1.0",
-    "simple-git": "^1.131.0",
-    "tmp": "^0.1.0"
+    "simple-git": "^2.5.0",
+    "tmp": "^0.2.0"
   }
 }

@@ -28,7 +28,7 @@ internals.prepareFixture = async ({ travisYml, packageJson, npmShrinkwrapJson, p
     internals.tmpObjects.push(tmpObj);
 
     if (travisYml) {
-        Fs.copyFileSync(Path.join(__dirname, 'fixtures', travisYml), Path.join(tmpObj.name, '.travis.yml'));
+        Fs.copyFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', travisYml), Path.join(tmpObj.name, '.travis.yml'));
     }
 
     if (packageJson !== false) {
@@ -135,11 +135,11 @@ describe('detect-node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13'],
+                        raw: ['10', '12', '14'],
                         resolved: {
-                            '10': '10.19.0',
-                            '12': '12.15.0',
-                            '13': '13.8.0'
+                            '10': '10.20.1',
+                            '12': '12.17.0',
+                            '14': '14.3.0'
                         }
                     },
                     engines: '>=10'
@@ -177,7 +177,7 @@ describe('detect-node-support', () => {
                     timestamp: 1580673602000,
                     travis: {
                         raw: ['10'],
-                        resolved: { '10': '10.19.0' }
+                        resolved: { '10': '10.20.1' }
                     }
                 });
             });
@@ -198,7 +198,7 @@ describe('detect-node-support', () => {
                     timestamp: 1580673602000,
                     travis: {
                         raw: ['latest'],
-                        resolved: { latest: '13.8.0' }
+                        resolved: { latest: '13.14.0' }
                     }
                 });
             });
@@ -243,8 +243,8 @@ describe('detect-node-support', () => {
                         resolved: {
                             '6': '6.17.1',
                             '8': '8.17.0',
-                            '10': '10.19.0',
-                            latest: '13.8.0'
+                            '10': '10.20.1',
+                            latest: '13.14.0'
                         }
                     }
                 });
@@ -275,11 +275,11 @@ describe('detect-node-support', () => {
                             '7': '7.10.1',
                             '8': '8.17.0',
                             '9': '9.11.2',
-                            '10': '10.19.0',
+                            '10': '10.20.1',
                             '11': '11.15.0',
-                            '12': '12.15.0',
-                            '13': '13.8.0',
-                            'lts/*': '12.15.0'
+                            '12': '12.17.0',
+                            '13': '13.14.0',
+                            'lts/*': '12.17.0'
                         }
                     }
                 });
@@ -328,8 +328,8 @@ describe('detect-node-support', () => {
                         raw: ['8', '10', '12'],
                         resolved: {
                             '8': '8.17.0',
-                            '10': '10.19.0',
-                            '12': '12.15.0'
+                            '10': '10.20.1',
+                            '12': '12.17.0'
                         }
                     }
                 });
@@ -355,9 +355,9 @@ describe('detect-node-support', () => {
                             '6': '6.17.1',
                             '8': '8.17.0',
                             '9': '9.11.2',
-                            '10': '10.19.0',
-                            '12': '12.15.0',
-                            'stable': '13.8.0'
+                            '10': '10.20.1',
+                            '12': '12.17.0',
+                            'stable': '13.14.0'
                         }
                     }
                 });
@@ -380,9 +380,9 @@ describe('detect-node-support', () => {
                     travis: {
                         raw: ['node', '10', '12', '8', '6'],
                         resolved: {
-                            'node': '13.8.0',
-                            '10': '10.19.0',
-                            '12': '12.15.0',
+                            'node': '13.14.0',
+                            '10': '10.20.1',
+                            '12': '12.17.0',
                             '8': '8.17.0',
                             '6': '6.17.1'
                         }
@@ -406,7 +406,7 @@ describe('detect-node-support', () => {
                     timestamp: 1580673602000,
                     travis: {
                         raw: ['node'],
-                        resolved: { node: '13.8.0' }
+                        resolved: { node: '13.14.0' }
                     }
                 });
             });
@@ -427,7 +427,7 @@ describe('detect-node-support', () => {
                     timestamp: 1580673602000,
                     travis: {
                         raw: ['latest'],
-                        resolved: { latest: '13.8.0' }
+                        resolved: { latest: '13.14.0' }
                     }
                 });
             });
@@ -523,11 +523,11 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13'],
+                        raw: ['10', '12', '14'],
                         resolved: {
-                            '10': '10.19.0',
-                            '12': '12.15.0',
-                            '13': '13.8.0'
+                            '10': '10.20.1',
+                            '12': '12.17.0',
+                            '14': '14.3.0'
                         }
                     },
                     engines: '>=10'
@@ -646,11 +646,11 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13'],
+                        raw: ['10', '12', '14'],
                         resolved: {
-                            '10': '10.19.0',
-                            '12': '12.15.0',
-                            '13': '13.8.0'
+                            '10': '10.20.1',
+                            '12': '12.17.0',
+                            '14': '14.3.0'
                         }
                     },
                     engines: '>=10'
@@ -769,11 +769,11 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13'],
+                        raw: ['10', '12', '14'],
                         resolved: {
-                            '10': '10.19.0',
-                            '12': '12.15.0',
-                            '13': '13.8.0'
+                            '10': '10.20.1',
+                            '12': '12.17.0',
+                            '14': '14.3.0'
                         }
                     },
                     engines: '>=10'
@@ -815,11 +815,11 @@ describe('detect-node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13'],
+                        raw: ['10', '12', '14'],
                         resolved: {
-                            '10': '10.19.0',
-                            '12': '12.15.0',
-                            '13': '13.8.0'
+                            '10': '10.20.1',
+                            '12': '12.17.0',
+                            '14': '14.3.0'
                         }
                     },
                     engines: '>=10'
@@ -848,11 +848,11 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13'],
+                        raw: ['10', '12', '14'],
                         resolved: {
-                            '10': '10.19.0',
-                            '12': '12.15.0',
-                            '13': '13.8.0'
+                            '10': '10.20.1',
+                            '12': '12.17.0',
+                            '14': '14.3.0'
                         }
                     },
                     engines: '>=10'
@@ -881,11 +881,11 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13'],
+                        raw: ['10', '12', '14'],
                         resolved: {
-                            '10': '10.19.0',
-                            '12': '12.15.0',
-                            '13': '13.8.0'
+                            '10': '10.20.1',
+                            '12': '12.17.0',
+                            '14': '14.3.0'
                         }
                     },
                     engines: '>=10'
@@ -918,11 +918,11 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13'],
+                        raw: ['10', '12', '14'],
                         resolved: {
-                            '10': '10.19.0',
-                            '12': '12.15.0',
-                            '13': '13.8.0'
+                            '10': '10.20.1',
+                            '12': '12.17.0',
+                            '14': '14.3.0'
                         }
                     },
                     engines: '>=10'
@@ -955,11 +955,11 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '13'],
+                        raw: ['10', '12', '14'],
                         resolved: {
-                            '10': '10.19.0',
-                            '12': '12.15.0',
-                            '13': '13.8.0'
+                            '10': '10.20.1',
+                            '12': '12.17.0',
+                            '14': '14.3.0'
                         }
                     }
                 });
@@ -990,11 +990,11 @@ describe('detect-node-support', () => {
                     .get('/watson/is-ci/HEAD/package.json')
                     .reply(200, JSON.stringify({ name: 'is-ci', version: '2.0.0' }))
                     .get('/watson/is-ci/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'testing-single-version.yml')))
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-single-version.yml')))
                     .get('/watson/ci-info/HEAD/package.json')
                     .reply(200, JSON.stringify({ name: 'ci-info', version: '2.0.0' }))
                     .get('/watson/ci-info/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'testing-single-version.yml')))
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-single-version.yml')))
                     .get('/visionmedia/debug/HEAD/package.json')
                     .reply(200, JSON.stringify({ name: 'debug', version: '4.1.1' }))
                     .get('/visionmedia/debug/HEAD/.travis.yml')
@@ -1034,7 +1034,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.19.0' }
+                                    resolved: { '10': '10.20.1' }
                                 }
                             },
                             {
@@ -1044,7 +1044,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.19.0' }
+                                    resolved: { '10': '10.20.1' }
                                 }
                             }
                         ]
@@ -1080,7 +1080,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.19.0' }
+                                    resolved: { '10': '10.20.1' }
                                 }
                             },
                             {
@@ -1090,7 +1090,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.19.0' }
+                                    resolved: { '10': '10.20.1' }
                                 }
                             }
                         ]
@@ -1126,7 +1126,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.19.0' }
+                                    resolved: { '10': '10.20.1' }
                                 }
                             },
                             {
@@ -1136,7 +1136,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.19.0' }
+                                    resolved: { '10': '10.20.1' }
                                 }
                             }
                         ]
@@ -1174,7 +1174,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.19.0' }
+                                    resolved: { '10': '10.20.1' }
                                 }
                             },
                             {
@@ -1190,7 +1190,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.19.0' }
+                                    resolved: { '10': '10.20.1' }
                                 }
                             },
                             {
@@ -1233,7 +1233,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.19.0' }
+                                    resolved: { '10': '10.20.1' }
                                 }
                             },
                             {
@@ -1249,7 +1249,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.19.0' }
+                                    resolved: { '10': '10.20.1' }
                                 }
                             }
                         ]
@@ -1285,7 +1285,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.19.0' }
+                                    resolved: { '10': '10.20.1' }
                                 }
                             },
                             {
@@ -1295,7 +1295,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.19.0' }
+                                    resolved: { '10': '10.20.1' }
                                 }
                             }
                         ]
@@ -1307,7 +1307,7 @@ describe('detect-node-support', () => {
 
                 const path = await internals.prepareFixture({
                     packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
-                    packageLockJson: 'testing-single-version.yml'
+                    packageLockJson: 'travis-ymls/testing-single-version.yml' // not a json file
                 });
 
                 await expect(NodeSupport.detect({ path }, { deps: true })).to.reject('Unexpected token l in JSON at position 0');
