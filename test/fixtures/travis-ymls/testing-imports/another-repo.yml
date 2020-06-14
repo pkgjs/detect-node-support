@@ -1,0 +1,4 @@
+language: node_js
+import:
+  - source: pkgjs/detect-node-support:test/fixtures/travis-ymls/testing-imports/partials/indirect-node-14.yml
+  - source: pkgjs/detect-node-support:test/fixtures/travis-ymls/testing-imports/partials/node-14.yml # cache hit

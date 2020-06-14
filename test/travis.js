@@ -1,5 +1,9 @@
 'use strict';
 
+const Fs = require('fs');
+const Nock = require('nock');
+const Path = require('path');
+
 const NodeSupport = require('..');
 
 const TestContext = require('./fixtures');
@@ -121,6 +125,34 @@ describe('.travis.yml parsing', () => {
             travis: {
                 raw: ['latest'],
                 resolved: { 'latest': '13.14.0' }
+            }
+        });
+    });
+
+    it('resolves from another repo', async () => {
+
+        Nock('https://raw.githubusercontent.com')
+            .get('/pkgjs/detect-node-support/HEAD/test/fixtures/travis-ymls/testing-imports/partials/indirect-node-14.yml')
+            .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-imports', 'partials', 'indirect-node-14.yml')))
+            .get('/pkgjs/detect-node-support/HEAD/test/fixtures/travis-ymls/testing-imports/partials/node-14.yml')
+            .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-imports', 'partials', 'node-14.yml')));
+
+        await fixture.setupRepoFolder({
+            partials: true,
+            travisYml: `testing-imports/another-repo.yml`
+        });
+
+        const result = await NodeSupport.detect({ path: fixture.path });
+
+        internals.assertCommit(result);
+
+        expect(result).to.equal({
+            name: 'test-module',
+            version: '0.0.0-development',
+            timestamp: 1580673602000,
+            travis: {
+                raw: ['14'],
+                resolved: { '14': '14.3.0' }
             }
         });
     });
