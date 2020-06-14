@@ -273,6 +273,16 @@ describe('.travis.yml parsing', () => {
 
         await expect(NodeSupport.detect({ path: fixture.path })).to.reject('Importing at commitish unsupported in partials/commitish.yml: partials/node-14.yml@main');
     });
+
+    it('throws when importing a circular dependency', async () => {
+
+        await fixture.setupRepoFolder({
+            partials: true,
+            travisYml: `testing-imports/circular.yml`
+        });
+
+        await expect(NodeSupport.detect({ path: fixture.path })).to.reject('Circular dependency partials/circular.yml requested by partials/circular.yml (already imported at .travis.yml)');
+    });
 });
 
 describe('Travis merging algorithms', () => {
