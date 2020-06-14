@@ -258,6 +258,26 @@ describe('.travis.yml parsing', () => {
 
         await expect(NodeSupport.detect({ path: fixture.path })).to.reject('Invalid merge mode for partials/node-12.yml in partials/merge-invalid.yml: no_such_merge_mode');
     });
+
+    it('throws when importing at commitish', async () => {
+
+        await fixture.setupRepoFolder({
+            partials: true,
+            travisYml: `testing-imports/partials/commitish.yml`
+        });
+
+        await expect(NodeSupport.detect({ path: fixture.path })).to.reject('Importing at commitish unsupported in .travis.yml: partials/node-14.yml@main');
+    });
+
+    it('throws when importing at commitish (indirect)', async () => {
+
+        await fixture.setupRepoFolder({
+            partials: true,
+            travisYml: `testing-imports/commitish.yml`
+        });
+
+        await expect(NodeSupport.detect({ path: fixture.path })).to.reject('Importing at commitish unsupported in partials/commitish.yml: partials/node-14.yml@main');
+    });
 });
 
 describe('Travis merging algorithms', () => {

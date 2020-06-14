@@ -93,6 +93,7 @@ module.exports = class TestContext {
         if (partials) {
             Fs.mkdirSync(Path.join(this.path, 'partials'));
             const partialYmls = [
+                'commitish.yml',
                 'indirect-node-14.yml',
                 'merge-invalid.yml',
                 'node-10.yml',
