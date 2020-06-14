@@ -1,0 +1,9 @@
+language: node_js
+node_js:
+  - "8"
+import:
+  - source: partials/node-14.yml # default merge: deep_merge_append
+  - source: partials/node-12.yml
+    mode: deep_merge_prepend
+  - source: partials/node-10.yml
+    mode: deep_merge_append

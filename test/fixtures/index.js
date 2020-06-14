@@ -91,6 +91,9 @@ module.exports = class TestContext {
             Fs.mkdirSync(Path.join(this.path, 'partials'));
             const partialYmls = [
                 'indirect-node-14.yml',
+                'merge-invalid.yml',
+                'node-10.yml',
+                'node-12.yml',
                 'node-14.yml'
             ];
             for (const fn of partialYmls) {
