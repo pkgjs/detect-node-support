@@ -81,4 +81,26 @@ describe('.travis.yml parsing', () => {
         });
     });
 
+    it('resolves indirect imports (./)', async () => {
+
+        await fixture.setupRepoFolder({
+            partials: true,
+            travisYml: `testing-imports/indirect-dot-slash.yml`
+        });
+
+        const result = await NodeSupport.detect({ path: fixture.path });
+
+        internals.assertCommit(result);
+
+        expect(result).to.equal({
+            name: 'test-module',
+            version: '0.0.0-development',
+            timestamp: 1580673602000,
+            travis: {
+                raw: ['14'],
+                resolved: { '14': '14.3.0' }
+            }
+        });
+    });
+
 });
