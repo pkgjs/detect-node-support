@@ -103,4 +103,26 @@ describe('.travis.yml parsing', () => {
         });
     });
 
+    it('ignores conditional imports', async () => {
+
+        await fixture.setupRepoFolder({
+            partials: true,
+            travisYml: `testing-imports/conditional.yml`
+        });
+
+        const result = await NodeSupport.detect({ path: fixture.path });
+
+        internals.assertCommit(result);
+
+        expect(result).to.equal({
+            name: 'test-module',
+            version: '0.0.0-development',
+            timestamp: 1580673602000,
+            travis: {
+                raw: ['latest'],
+                resolved: { 'latest': '13.14.0' }
+            }
+        });
+    });
+
 });
