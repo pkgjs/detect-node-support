@@ -156,6 +156,11 @@ describe('.travis.yml parsing', () => {
                 resolved: { '14': '14.3.0' }
             }
         });
+
+        // verify cache returns the same result
+        const result2 = await NodeSupport.detect({ path: fixture.path });
+        internals.assertCommit(result2);
+        expect(result2).to.equal(result);
     });
 
     it('resolves and merges (prepend/append)', async () => {
