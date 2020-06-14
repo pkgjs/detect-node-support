@@ -5,6 +5,7 @@ const Nock = require('nock');
 const Path = require('path');
 
 const NodeSupport = require('..');
+const TravisMerge = require('../lib/travis/merge');
 
 const TestContext = require('./fixtures');
 
@@ -157,4 +158,234 @@ describe('.travis.yml parsing', () => {
         });
     });
 
+    it('resolves and merges (prepend/append)', async () => {
+
+        await fixture.setupRepoFolder({
+            partials: true,
+            travisYml: `testing-imports/merge-deep-prepend-append.yml`
+        });
+
+        const result = await NodeSupport.detect({ path: fixture.path });
+
+        internals.assertCommit(result);
+
+        expect(result).to.equal({
+            name: 'test-module',
+            version: '0.0.0-development',
+            timestamp: 1580673602000,
+            travis: {
+                raw: ['12', '8', '14', '10.15', '10.16'],
+                resolved: {
+                    '8': '8.17.0',
+                    '10.15': '10.15.3',
+                    '10.16': '10.16.3',
+                    '12': '12.17.0',
+                    '14': '14.3.0'
+                }
+            }
+        });
+    });
+
+    it('resolves and merges (deep)', async () => {
+
+        await fixture.setupRepoFolder({
+            partials: true,
+            travisYml: `testing-imports/merge-deep.yml`
+        });
+
+        const result = await NodeSupport.detect({ path: fixture.path });
+
+        internals.assertCommit(result);
+
+        expect(result).to.equal({
+            name: 'test-module',
+            version: '0.0.0-development',
+            timestamp: 1580673602000,
+            travis: {
+                raw: ['12'],
+                resolved: {
+                    '12': '12.17.0'
+                }
+            }
+        });
+    });
+
+    it('resolves and merges (shallow)', async () => {
+
+        await fixture.setupRepoFolder({
+            partials: true,
+            travisYml: `testing-imports/merge-shallow.yml`
+        });
+
+        const result = await NodeSupport.detect({ path: fixture.path });
+
+        internals.assertCommit(result);
+
+        expect(result).to.equal({
+            name: 'test-module',
+            version: '0.0.0-development',
+            timestamp: 1580673602000,
+            travis: {
+                raw: ['12'],
+                resolved: {
+                    '12': '12.17.0'
+                }
+            }
+        });
+    });
+
+    it('throws on invalid merge mode', async () => {
+
+        await fixture.setupRepoFolder({
+            partials: true,
+            travisYml: `testing-imports/partials/merge-invalid.yml`
+        });
+
+        await expect(NodeSupport.detect({ path: fixture.path })).to.reject('Invalid merge mode for partials/node-12.yml in .travis.yml: no_such_merge_mode');
+    });
+
+    it('throws on invalid merge mode (indirect)', async () => {
+
+        await fixture.setupRepoFolder({
+            partials: true,
+            travisYml: `testing-imports/merge-invalid.yml`
+        });
+
+        await expect(NodeSupport.detect({ path: fixture.path })).to.reject('Invalid merge mode for partials/node-12.yml in partials/merge-invalid.yml: no_such_merge_mode');
+    });
+});
+
+describe('Travis merging algorithms', () => {
+
+    let left;
+    let right;
+
+    beforeEach(() => {
+
+        left = {
+            str1: 'left',
+            str2: 'left',
+            arr: ['left'],
+            obj: {
+                left: true,
+                arr: ['left'],
+                deep: {
+                    left: true,
+                    arr: ['left']
+                }
+            },
+            mix1: ['left'],
+            mix2: { left: true }
+        };
+
+        right = {
+            str1: 'right',
+            str3: 'right',
+            arr: ['right'],
+            obj: {
+                right: true,
+                arr: ['right'],
+                deep: {
+                    right: true,
+                    arr: ['right']
+                }
+            },
+            mix1: { right: true },
+            mix2: ['right']
+        };
+    });
+
+    it('deep_merge_append', () => {
+
+        TravisMerge.deep_merge_append(left, right);
+
+        expect(left).to.equal({
+            str1: 'right',
+            str2: 'left',
+            str3: 'right',
+            arr: ['left', 'right'],
+            obj: {
+                left: true,
+                right: true,
+                arr: ['left', 'right'],
+                deep: {
+                    left: true,
+                    right: true,
+                    arr: ['left', 'right']
+                }
+            },
+            mix1: { right: true },
+            mix2: ['right']
+        });
+    });
+
+    it('deep_merge_prepend', () => {
+
+        TravisMerge.deep_merge_prepend(left, right);
+
+        expect(left).to.equal({
+            str1: 'right',
+            str2: 'left',
+            str3: 'right',
+            arr: ['right', 'left'],
+            obj: {
+                left: true,
+                right: true,
+                arr: ['right', 'left'],
+                deep: {
+                    left: true,
+                    right: true,
+                    arr: ['right', 'left']
+                }
+            },
+            mix1: { right: true },
+            mix2: ['right']
+        });
+    });
+
+    it('deep_merge', () => {
+
+        TravisMerge.deep_merge(left, right);
+
+        expect(left).to.equal({
+            str1: 'right',
+            str2: 'left',
+            str3: 'right',
+            arr: ['right'],
+            obj: {
+                left: true,
+                right: true,
+                arr: ['right'],
+                deep: {
+                    left: true,
+                    right: true,
+                    arr: ['right']
+                }
+            },
+            mix1: { right: true },
+            mix2: ['right']
+        });
+    });
+
+    it('merge', () => {
+
+        TravisMerge.merge(left, right);
+
+        expect(left).to.equal({
+            str1: 'right',
+            str2: 'left',
+            str3: 'right',
+            arr: ['right'],
+            obj: {
+                right: true,
+                arr: ['right'],
+                deep: {
+                    right: true,
+                    arr: ['right']
+                }
+            },
+            mix1: { right: true },
+            mix2: ['right']
+        });
+    });
 });
