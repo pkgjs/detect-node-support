@@ -132,11 +132,15 @@ describe('.travis.yml parsing', () => {
 
     it('resolves from another repo', async () => {
 
-        Nock('https://raw.githubusercontent.com')
-            .get('/pkgjs/detect-node-support/HEAD/test/fixtures/travis-ymls/testing-imports/partials/indirect-node-14.yml')
-            .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-imports', 'partials', 'indirect-node-14.yml')))
-            .get('/pkgjs/detect-node-support/HEAD/test/fixtures/travis-ymls/testing-imports/partials/node-14.yml')
-            .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-imports', 'partials', 'node-14.yml')));
+        Nock('https://api.github.com')
+            .get(`/repos/pkgjs/detect-node-support/contents/${encodeURIComponent('test/fixtures/travis-ymls/testing-imports/partials/indirect-node-14.yml')}`)
+            .reply(200, {
+                content: Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-imports', 'partials', 'indirect-node-14.yml')).toString('base64')
+            })
+            .get(`/repos/pkgjs/detect-node-support/contents/${encodeURIComponent('test/fixtures/travis-ymls/testing-imports/partials/node-14.yml')}`)
+            .reply(200, {
+                content: Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-imports', 'partials', 'node-14.yml')).toString('base64')
+            });
 
         await fixture.setupRepoFolder({
             partials: true,
