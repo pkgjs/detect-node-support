@@ -4,10 +4,10 @@ const Fs = require('fs');
 const Nock = require('nock');
 const Path = require('path');
 const Sinon = require('sinon');
-const Wreck = require('@hapi/wreck');
 
 const NodeSupport = require('..');
 
+const OctokitWrapper = require('../lib/loader/octokit-wrapper');
 const TestContext = require('./fixtures');
 
 
@@ -426,11 +426,15 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')).toString('base64')
+                    });
 
                 const result = await NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' });
 
@@ -459,11 +463,15 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')).toString('base64')
+                    });
 
                 const result = await NodeSupport.detect({ repository: 'pkgjs/detect-node-support' });
 
@@ -492,10 +500,12 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
                     .reply(404);
 
                 const result = await NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' });
@@ -517,14 +527,16 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
                     .reply(500);
 
-                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' }))
-                    .to.reject('Response Error: 500 null'); // the null is a Nock/Wreck implementation detail
+                const err = await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' })).to.reject();
+                expect(err.name).to.equal('HttpError');
             });
 
             it('throws when repository does not have a package.json', async () => {
@@ -532,11 +544,13 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
                     .reply(404)
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')).toString('base64')
+                    });
 
                 await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' }))
                     .to.reject(`git+https://github.com/pkgjs/detect-node-support.git does not contain a package.json`);
@@ -544,21 +558,23 @@ describe('detect-node-support', () => {
 
             it('rethrows server errors', async () => {
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
                     .reply(500)
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')).toString('base64')
+                    });
 
-                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' }))
-                    .to.reject(/Response Error/);
+                const err = await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' })).to.reject();
+                expect(err.name).to.equal('HttpError');
             });
 
             it('rethrows generic errors', async () => {
 
                 const err = new Error('Something went wrong');
 
-                Sinon.stub(Wreck, 'get').throws(err);
+                Sinon.stub(OctokitWrapper, 'create').throws(err);
 
                 await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' }))
                     .to.reject('Something went wrong');
@@ -578,11 +594,15 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')).toString('base64')
+                    });
 
                 Nock('https://registry.npmjs.org')
                     .get('/detect-node-support')
@@ -615,10 +635,12 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
                     .reply(404);
 
                 Nock('https://registry.npmjs.org')
@@ -667,7 +689,7 @@ describe('detect-node-support', () => {
 
                 const err = new Error('Something went wrong');
 
-                Sinon.stub(Wreck, 'get').throws(err);
+                Sinon.stub(OctokitWrapper, 'create').throws(err);
 
                 await expect(NodeSupport.detect({ packageName: 'detect-node-support' }))
                     .to.reject('Something went wrong');
@@ -698,11 +720,15 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')).toString('base64')
+                    });
 
                 Nock('https://registry.npmjs.org')
                     .get('/detect-node-support')
@@ -738,11 +764,15 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
-                    .reply(200, JSON.stringify({ name: 'something-else' }))
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Buffer.from(JSON.stringify({ name: 'something-else' })).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')).toString('base64')
+                    });
 
                 Nock('https://registry.npmjs.org')
                     .get('/detect-node-support')
@@ -784,11 +814,15 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')).toString('base64')
+                    });
 
                 const result = await NodeSupport.detect('git+https://github.com/pkgjs/detect-node-support.git');
 
@@ -817,11 +851,15 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')).toString('base64')
+                    });
 
                 const result = await NodeSupport.detect('pkgjs/detect-node-support');
 
@@ -850,11 +888,15 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/pkgjs/detect-node-support/HEAD/package.json')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
-                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')).toString('base64')
+                    });
 
                 Nock('https://registry.npmjs.org')
                     .get('/detect-node-support')
@@ -887,11 +929,15 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/hapijs/hapi/HEAD/package.json')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'hapi-package.json')))
-                    .get('/hapijs/hapi/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+                Nock('https://api.github.com')
+                    .get('/repos/hapijs/hapi/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, 'fixtures', 'hapi-package.json')).toString('base64')
+                    })
+                    .get('/repos/hapijs/hapi/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')).toString('base64')
+                    });
 
                 Nock('https://registry.npmjs.org')
                     .get('/@hapi%2fhapi')
@@ -939,24 +985,36 @@ describe('detect-node-support', () => {
                     .get('/rimraf')
                     .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'packuments', 'rimraf.json')));
 
-                Nock('https://raw.githubusercontent.com')
-                    .get('/watson/is-ci/HEAD/package.json')
-                    .reply(200, JSON.stringify({ name: 'is-ci', version: '2.0.0' }))
-                    .get('/watson/is-ci/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-single-version.yml')))
-                    .get('/watson/ci-info/HEAD/package.json')
-                    .reply(200, JSON.stringify({ name: 'ci-info', version: '2.0.0' }))
-                    .get('/watson/ci-info/HEAD/.travis.yml')
-                    .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-single-version.yml')))
-                    .get('/visionmedia/debug/HEAD/package.json')
-                    .reply(200, JSON.stringify({ name: 'debug', version: '4.1.1' }))
-                    .get('/visionmedia/debug/HEAD/.travis.yml')
+                Nock('https://api.github.com')
+                    .get('/repos/watson/is-ci/contents/package.json')
+                    .reply(200, {
+                        content: Buffer.from(JSON.stringify({ name: 'is-ci', version: '2.0.0' })).toString('base64')
+                    })
+                    .get('/repos/watson/is-ci/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-single-version.yml')).toString('base64')
+                    })
+                    .get('/repos/watson/ci-info/contents/package.json')
+                    .reply(200, {
+                        content: Buffer.from(JSON.stringify({ name: 'ci-info', version: '2.0.0' })).toString('base64')
+                    })
+                    .get('/repos/watson/ci-info/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', 'testing-single-version.yml')).toString('base64')
+                    })
+                    .get('/repos/visionmedia/debug/contents/package.json')
+                    .reply(200, {
+                        content: Buffer.from(JSON.stringify({ name: 'debug', version: '4.1.1' })).toString('base64')
+                    })
+                    .get('/repos/visionmedia/debug/contents/.travis.yml')
                     .reply(404)
-                    .get('/zeit/ms/HEAD/package.json')
-                    .reply(200, JSON.stringify({ name: 'ms', version: '2.1.2' }))
-                    .get('/zeit/ms/HEAD/.travis.yml')
+                    .get('/repos/zeit/ms/contents/package.json')
+                    .reply(200, {
+                        content: Buffer.from(JSON.stringify({ name: 'ms', version: '2.1.2' })).toString('base64')
+                    })
+                    .get('/repos/zeit/ms/contents/.travis.yml')
                     .reply(404)
-                    .get('/isaacs/rimraf/HEAD/package.json')
+                    .get('/repos/isaacs/rimraf/contents/package.json')
                     .reply(404);
             });
 
