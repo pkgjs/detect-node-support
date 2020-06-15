@@ -594,7 +594,11 @@ describe('detect-node-support', () => {
                 fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
-                Nock('https://api.github.com')
+                Nock('https://api.github.com', {
+                    reqheaders: {
+                        'user-agent': /detect-node-support\/.* \(https:\/\/github.com\/pkgjs\/detect-node-support#readme\)/
+                    }
+                })
                     .get('/repos/pkgjs/detect-node-support/contents/package.json')
                     .reply(200, {
                         content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
