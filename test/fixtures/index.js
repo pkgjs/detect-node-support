@@ -7,7 +7,7 @@ const SimpleGit = require('simple-git/promise');
 const Sinon = require('sinon');
 const Tmp = require('tmp');
 
-const Loader = require('../../lib/loader');
+const RepositoryLoader = require('../../lib/loader/repository');
 const Utils = require('../../lib/utils');
 
 
@@ -29,7 +29,7 @@ module.exports = class TestContext {
 
     cleanup() {
 
-        Loader.clearCache();
+        RepositoryLoader.clearCache();
 
         Sinon.restore();
 
