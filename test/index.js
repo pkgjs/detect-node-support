@@ -456,7 +456,7 @@ describe('detect-node-support', () => {
 
             it('supports "owner/repo" style repository string', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -467,8 +467,8 @@ describe('detect-node-support', () => {
 
                 const result = await NodeSupport.detect({ repository: 'pkgjs/detect-node-support' });
 
-                expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support', 'HEAD']]);
+                expect(fixture.stubs.listRemote.callCount).to.equal(1);
+                expect(fixture.stubs.listRemote.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support', 'HEAD']]);
 
                 expect(result).to.equal({
                     name: 'detect-node-support',
