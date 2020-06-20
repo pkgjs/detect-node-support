@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@npmcli/arborist": "0.0.0-pre.21",
+    "@octokit/plugin-throttling": "^3.2.2",
     "@octokit/rest": "^18.0.0",
     "@pkgjs/nv": "0.0.3",
     "debug": "^4.1.1",
