@@ -454,6 +454,39 @@ describe('detect-node-support', () => {
                 });
             });
 
+            it('supports "owner/repo" style repository string', async () => {
+
+                listRemoteStub
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://raw.githubusercontent.com')
+                    .get('/pkgjs/detect-node-support/HEAD/package.json')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', 'package.json')))
+                    .get('/pkgjs/detect-node-support/HEAD/.travis.yml')
+                    .reply(200, Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')));
+
+                const result = await NodeSupport.detect({ repository: 'pkgjs/detect-node-support' });
+
+                expect(listRemoteStub.callCount).to.equal(1);
+                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support', 'HEAD']]);
+
+                expect(result).to.equal({
+                    name: 'detect-node-support',
+                    version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['10', '12', '14'],
+                        resolved: {
+                            '10': '10.20.1',
+                            '12': '12.17.0',
+                            '14': '14.3.0'
+                        }
+                    },
+                    engines: '>=10'
+                });
+            });
+
             it('leaves out `travis` when no `.travis.yml` present', async () => {
 
                 fixture.stubs.listRemote
