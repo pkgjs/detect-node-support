@@ -533,10 +533,9 @@ describe('detect-node-support', () => {
                         content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
                     })
                     .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
-                    .reply(500);
+                    .reply(500, 'Simulated server error');
 
-                const err = await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' })).to.reject();
-                expect(err.name).to.equal('HttpError');
+                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' })).to.reject('Simulated server error');
             });
 
             it('throws when repository does not have a package.json', async () => {
@@ -584,6 +583,62 @@ describe('detect-node-support', () => {
 
                 await expect(NodeSupport.detect({ repository: 'git+https://github.example.com/pkgjs/detect-node-support.git' }))
                     .to.reject('Only github.com paths supported, feel free to PR at https://github.com/pkgjs/detect-node-support');
+            });
+
+            it('retries when rate limited', async () => {
+
+                fixture.stubs.listRemote
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(403, null, {
+                        'x-ratelimit-limit': '60',
+                        'x-ratelimit-remaining': '0',
+                        'x-ratelimit-reset': `${Math.round(Date.now() / 1000) + 1}`
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', '.travis.yml')).toString('base64')
+                    });
+
+                const result = await NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' });
+
+                expect(result).to.equal({
+                    name: 'detect-node-support',
+                    version: '0.0.0-development',
+                    commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
+                    timestamp: 1580673602000,
+                    travis: {
+                        raw: ['14', '12', '10'],
+                        resolved: {
+                            '10': '10.20.1',
+                            '12': '12.17.0',
+                            '14': '14.3.0'
+                        }
+                    },
+                    engines: '>=10'
+                });
+            });
+
+            it('aborts on abuse limit', async () => {
+
+                fixture.stubs.listRemote
+                    .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
+
+                Nock('https://api.github.com')
+                    .get('/repos/pkgjs/detect-node-support/contents/package.json')
+                    .reply(200, {
+                        content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
+                    })
+                    .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
+                    .reply(403, 'Abuse detected');
+
+                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' })).to.reject(/Abuse detected/);
             });
         });
 
