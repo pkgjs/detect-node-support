@@ -4,6 +4,10 @@ List the Node.js versions supported by the package/repository
 
 This repository is managed by the [Package Maintenance Working Group](https://github.com/nodejs/package-maintenance), see [Governance](https://github.com/nodejs/package-maintenance/blob/master/Governance.md).
 
+## Setup
+
+No setup is required, however if you do not have a `GH_TOKEN` environment limit, you will likely hit a request rate limit on Github API, which may result in very long wait times for retries.
+
 ## Usage (command line)
 
 ```
