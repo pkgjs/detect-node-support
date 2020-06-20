@@ -4,57 +4,18 @@ const Fs = require('fs');
 const Nock = require('nock');
 const Path = require('path');
 const Sinon = require('sinon');
-const SimpleGit = require('simple-git/promise');
-const Tmp = require('tmp');
 const Wreck = require('@hapi/wreck');
 
 const NodeSupport = require('..');
 
-const Utils = require('../lib/utils');
+const TestContext = require('./fixtures');
 
 
 const { describe, it, beforeEach, afterEach } = exports.lab = require('@hapi/lab').script();
 const { expect } = require('@hapi/code');
 
 
-const internals = {
-    tmpObjects: []
-};
-
-internals.prepareFixture = async ({ travisYml, packageJson, npmShrinkwrapJson, packageLockJson, git = true } = {}) => {
-
-    const tmpObj = Tmp.dirSync({ unsafeCleanup: true });
-
-    internals.tmpObjects.push(tmpObj);
-
-    if (travisYml) {
-        Fs.copyFileSync(Path.join(__dirname, 'fixtures', 'travis-ymls', travisYml), Path.join(tmpObj.name, '.travis.yml'));
-    }
-
-    if (packageJson !== false) {
-        Fs.writeFileSync(Path.join(tmpObj.name, 'package.json'), JSON.stringify(packageJson || {
-            name: 'test-module',
-            version: '0.0.0-development'
-        }));
-    }
-
-    if (npmShrinkwrapJson) {
-        Fs.copyFileSync(Path.join(__dirname, 'fixtures', npmShrinkwrapJson), Path.join(tmpObj.name, 'npm-shrinkwrap.json'));
-    }
-
-    if (packageLockJson) {
-        Fs.copyFileSync(Path.join(__dirname, 'fixtures', packageLockJson), Path.join(tmpObj.name, 'package-lock.json'));
-    }
-
-    if (git) {
-        const simpleGit = SimpleGit(tmpObj.name);
-        await simpleGit.init();
-        await simpleGit.add('./*');
-        await simpleGit.commit('initial commit', ['--no-gpg-sign']);
-    }
-
-    return tmpObj.name;
-};
+const internals = {};
 
 
 internals.assertCommit = (result) => {
@@ -65,57 +26,16 @@ internals.assertCommit = (result) => {
 
 describe('detect-node-support', () => {
 
-    let listRemoteStub;
+    let fixture;
 
     beforeEach(() => {
 
-        listRemoteStub = Sinon.stub().throws();
-
-        Sinon.useFakeTimers({
-            now: +new Date('2020-02-02T20:00:02Z'),
-            toFake: ['Date']
-        });
-
-        Sinon.stub(Utils, 'simpleGit').callsFake((...args) => {
-
-            const simpleGit = SimpleGit(...args);
-
-            Sinon.stub(simpleGit, 'listRemote').callsFake(listRemoteStub);
-
-            return simpleGit;
-        });
-
-        if (!Nock.isActive()) {
-            Nock.activate();
-        }
-
-        Nock.disableNetConnect();
-
-        Nock('https://raw.githubusercontent.com')
-            .persist()
-            .get('/nodejs/Release/master/schedule.json')
-            .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'node-release-schedule.json')));
-
-        Nock('https://nodejs.org')
-            .persist()
-            .get('/dist/index.json')
-            .reply(200, Fs.readFileSync(Path.join(__dirname, 'fixtures', 'node-release-dist.json')));
+        fixture = new TestContext();
     });
 
     afterEach(() => {
 
-        internals.tmpObjects.forEach((tmpObj) => {
-
-            tmpObj.removeCallback();
-        });
-
-        internals.tmpObjects = [];
-
-        Sinon.restore();
-
-        Nock.restore();
-        Nock.cleanAll();
-        Nock.enableNetConnect();
+        fixture.cleanup();
     });
 
     describe('detect()', () => {
@@ -148,9 +68,9 @@ describe('detect-node-support', () => {
 
             it('leaves out `travis` when no `.travis.yml` present', async () => {
 
-                const path = await internals.prepareFixture();
+                await fixture.setupRepoFolder();
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -163,11 +83,11 @@ describe('detect-node-support', () => {
 
             it('returns the single node version', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'testing-single-version.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -184,11 +104,11 @@ describe('detect-node-support', () => {
 
             it('returns default node version', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'testing-minimal.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -205,11 +125,11 @@ describe('detect-node-support', () => {
 
             it('returns empty array when no node detected', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'testing-no-node.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -226,11 +146,11 @@ describe('detect-node-support', () => {
 
             it('returns node versions from matrix env vars (NODEJS_VER)', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'kangax-html-minifier.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -252,11 +172,11 @@ describe('detect-node-support', () => {
 
             it('returns node versions from matrix env vars (TRAVIS_NODE_VERSION)', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'nodejs-nan.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -287,11 +207,11 @@ describe('detect-node-support', () => {
 
             it('returns node versions from matrix env vars (NODE_VER)', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'reactivex-rxjs.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -312,11 +232,11 @@ describe('detect-node-support', () => {
 
             it('handles non-matching matrix env vars', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'caolan-async.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -337,11 +257,11 @@ describe('detect-node-support', () => {
 
             it('returns node versions from matrix include', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'nodejs-readable-stream.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -365,11 +285,11 @@ describe('detect-node-support', () => {
 
             it('handles single matrix include', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'postcss-autoprefixer.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -392,11 +312,11 @@ describe('detect-node-support', () => {
 
             it('handles matrix includes without node versions', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'shinn-is-resolvable.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -413,11 +333,11 @@ describe('detect-node-support', () => {
 
             it('handles missing env.matrix', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'testing-no-env-matrix.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -434,11 +354,11 @@ describe('detect-node-support', () => {
 
             it('handles invalid node versions', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'testing-invalid-version.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -455,11 +375,11 @@ describe('detect-node-support', () => {
 
             it('handles duplicate key in .travis.yml', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'npm-promzard.yml'
                 });
 
-                const result = await NodeSupport.detect({ path });
+                const result = await NodeSupport.detect({ path: fixture.path });
 
                 internals.assertCommit(result);
 
@@ -481,21 +401,21 @@ describe('detect-node-support', () => {
 
             it('throws when path is not a git repo', async () => {
 
-                const path = await internals.prepareFixture({ git: false });
+                await fixture.setupRepoFolder({ git: false });
 
-                await expect(NodeSupport.detect({ path }))
-                    .to.reject(`${path} is not a git repository`);
+                await expect(NodeSupport.detect({ path: fixture.path }))
+                    .to.reject(`${fixture.path} is not a git repository`);
             });
 
             it('throws when path does not have a package.json', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     travisYml: 'testing-no-node.yml',
                     packageJson: false
                 });
 
-                await expect(NodeSupport.detect({ path }))
-                    .to.reject(`${path} does not contain a package.json`);
+                await expect(NodeSupport.detect({ path: fixture.path }))
+                    .to.reject(`${fixture.path} does not contain a package.json`);
             });
         });
 
@@ -503,7 +423,7 @@ describe('detect-node-support', () => {
 
             it('returns node versions from `.travis.yml` in the repository', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -514,8 +434,8 @@ describe('detect-node-support', () => {
 
                 const result = await NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' });
 
-                expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
+                expect(fixture.stubs.listRemote.callCount).to.equal(1);
+                expect(fixture.stubs.listRemote.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
 
                 expect(result).to.equal({
                     name: 'detect-node-support',
@@ -536,7 +456,7 @@ describe('detect-node-support', () => {
 
             it('leaves out `travis` when no `.travis.yml` present', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -547,8 +467,8 @@ describe('detect-node-support', () => {
 
                 const result = await NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' });
 
-                expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
+                expect(fixture.stubs.listRemote.callCount).to.equal(1);
+                expect(fixture.stubs.listRemote.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
 
                 expect(result).to.equal({
                     name: 'detect-node-support',
@@ -561,7 +481,7 @@ describe('detect-node-support', () => {
 
             it('throws when loading `.travis.yml` fails', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -576,7 +496,7 @@ describe('detect-node-support', () => {
 
             it('throws when repository does not have a package.json', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -622,7 +542,7 @@ describe('detect-node-support', () => {
 
             it('returns node versions from `.travis.yml` in the package repository', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -637,8 +557,8 @@ describe('detect-node-support', () => {
 
                 const result = await NodeSupport.detect({ packageName: 'detect-node-support' });
 
-                expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
+                expect(fixture.stubs.listRemote.callCount).to.equal(1);
+                expect(fixture.stubs.listRemote.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
 
                 expect(result).to.equal({
                     name: 'detect-node-support',
@@ -659,7 +579,7 @@ describe('detect-node-support', () => {
 
             it('leaves out `travis` when no `.travis.yml` present', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -674,8 +594,8 @@ describe('detect-node-support', () => {
 
                 const result = await NodeSupport.detect({ packageName: 'detect-node-support' });
 
-                expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
+                expect(fixture.stubs.listRemote.callCount).to.equal(1);
+                expect(fixture.stubs.listRemote.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
 
                 expect(result).to.equal({
                     name: 'detect-node-support',
@@ -742,7 +662,7 @@ describe('detect-node-support', () => {
 
             it('returns node versions from `.travis.yml` in the package repository (string repository)', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -760,8 +680,8 @@ describe('detect-node-support', () => {
 
                 const result = await NodeSupport.detect({ packageName: 'detect-node-support' });
 
-                expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
+                expect(fixture.stubs.listRemote.callCount).to.equal(1);
+                expect(fixture.stubs.listRemote.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
 
                 expect(result).to.equal({
                     name: 'detect-node-support',
@@ -782,7 +702,7 @@ describe('detect-node-support', () => {
 
             it('throws when repo package name does not match', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -828,7 +748,7 @@ describe('detect-node-support', () => {
 
             it('returns node versions from `.travis.yml` in the repository (url case)', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -839,8 +759,8 @@ describe('detect-node-support', () => {
 
                 const result = await NodeSupport.detect('git+https://github.com/pkgjs/detect-node-support.git');
 
-                expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
+                expect(fixture.stubs.listRemote.callCount).to.equal(1);
+                expect(fixture.stubs.listRemote.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
 
                 expect(result).to.equal({
                     name: 'detect-node-support',
@@ -861,7 +781,7 @@ describe('detect-node-support', () => {
 
             it('returns node versions from `.travis.yml` in the repository ("org/repo" case)', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -872,8 +792,8 @@ describe('detect-node-support', () => {
 
                 const result = await NodeSupport.detect('pkgjs/detect-node-support');
 
-                expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support', 'HEAD']]);
+                expect(fixture.stubs.listRemote.callCount).to.equal(1);
+                expect(fixture.stubs.listRemote.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support', 'HEAD']]);
 
                 expect(result).to.equal({
                     name: 'detect-node-support',
@@ -894,7 +814,7 @@ describe('detect-node-support', () => {
 
             it('returns node versions from `.travis.yml` in the package repository', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -909,8 +829,8 @@ describe('detect-node-support', () => {
 
                 const result = await NodeSupport.detect('detect-node-support');
 
-                expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
+                expect(fixture.stubs.listRemote.callCount).to.equal(1);
+                expect(fixture.stubs.listRemote.args[0]).to.equal([['http://github.com/pkgjs/detect-node-support.git', 'HEAD']]);
 
                 expect(result).to.equal({
                     name: 'detect-node-support',
@@ -931,7 +851,7 @@ describe('detect-node-support', () => {
 
             it('returns node versions from `.travis.yml` in the package repository (scoped)', async () => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://raw.githubusercontent.com')
@@ -946,8 +866,8 @@ describe('detect-node-support', () => {
 
                 const result = await NodeSupport.detect('@hapi/hapi');
 
-                expect(listRemoteStub.callCount).to.equal(1);
-                expect(listRemoteStub.args[0]).to.equal([['http://github.com/hapijs/hapi.git', 'HEAD']]);
+                expect(fixture.stubs.listRemote.callCount).to.equal(1);
+                expect(fixture.stubs.listRemote.args[0]).to.equal([['http://github.com/hapijs/hapi.git', 'HEAD']]);
 
                 expect(result).to.equal({
                     name: '@hapi/hapi',
@@ -970,7 +890,7 @@ describe('detect-node-support', () => {
 
             beforeEach(() => {
 
-                listRemoteStub
+                fixture.stubs.listRemote
                     .returns('9cef39d21ad229dea4b10295f55b0d9a83800b23\tHEAD\n');
 
                 Nock('https://registry.npmjs.org')
@@ -1009,11 +929,11 @@ describe('detect-node-support', () => {
 
             it('resolves direct prod dep information', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString())
                 });
 
-                const result = await NodeSupport.detect({ path }, { deps: true });
+                const result = await NodeSupport.detect({ path: fixture.path }, { deps: true });
 
                 internals.assertCommit(result);
 
@@ -1054,12 +974,12 @@ describe('detect-node-support', () => {
 
             it('resolves deps from shrinkwrap', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
                     npmShrinkwrapJson: 'deps-test/npm-shrinkwrap.json'
                 });
 
-                const result = await NodeSupport.detect({ path }, { deps: true });
+                const result = await NodeSupport.detect({ path: fixture.path }, { deps: true });
 
                 internals.assertCommit(result);
 
@@ -1100,12 +1020,12 @@ describe('detect-node-support', () => {
 
             it('resolves deps from package-lock', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
                     packageLockJson: 'deps-test/npm-shrinkwrap.json'
                 });
 
-                const result = await NodeSupport.detect({ path }, { deps: true });
+                const result = await NodeSupport.detect({ path: fixture.path }, { deps: true });
 
                 internals.assertCommit(result);
 
@@ -1146,12 +1066,12 @@ describe('detect-node-support', () => {
 
             it('resolves all deps', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
                     npmShrinkwrapJson: 'deps-test/npm-shrinkwrap.json'
                 });
 
-                const result = await NodeSupport.detect({ path }, { deps: true, deep: true, dev: true });
+                const result = await NodeSupport.detect({ path: fixture.path }, { deps: true, deep: true, dev: true });
 
                 internals.assertCommit(result);
 
@@ -1206,12 +1126,12 @@ describe('detect-node-support', () => {
 
             it('resolves direct deps', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
                     npmShrinkwrapJson: 'deps-test/npm-shrinkwrap.json'
                 });
 
-                const result = await NodeSupport.detect({ path }, { deps: true, dev: true });
+                const result = await NodeSupport.detect({ path: fixture.path }, { deps: true, dev: true });
 
                 internals.assertCommit(result);
 
@@ -1259,12 +1179,12 @@ describe('detect-node-support', () => {
 
             it('resolves all prod deps', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
                     npmShrinkwrapJson: 'deps-test/npm-shrinkwrap.json'
                 });
 
-                const result = await NodeSupport.detect({ path }, { deps: true, deep: true });
+                const result = await NodeSupport.detect({ path: fixture.path }, { deps: true, deep: true });
 
                 internals.assertCommit(result);
 
@@ -1305,19 +1225,19 @@ describe('detect-node-support', () => {
 
             it('rethrows lock file parsing errors', async () => {
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     packageJson: JSON.parse(Fs.readFileSync(Path.join(__dirname, 'fixtures', 'deps-test', 'package.json')).toString()),
                     packageLockJson: 'travis-ymls/testing-single-version.yml' // not a json file
                 });
 
-                await expect(NodeSupport.detect({ path }, { deps: true })).to.reject('Unexpected token l in JSON at position 0');
+                await expect(NodeSupport.detect({ path: fixture.path }, { deps: true })).to.reject('Unexpected token l in JSON at position 0');
             });
 
             it('handles failures to load packages', async () => {
 
                 Sinon.stub(console, 'warn');
 
-                const path = await internals.prepareFixture({
+                await fixture.setupRepoFolder({
                     packageJson: {
                         name: '@pkgjs/detect-node-support-deps-test',
                         version: '0.0.0-development',
@@ -1327,7 +1247,7 @@ describe('detect-node-support', () => {
                     }
                 });
 
-                const result = await NodeSupport.detect({ path }, { deps: true });
+                const result = await NodeSupport.detect({ path: fixture.path }, { deps: true });
 
                 internals.assertCommit(result);
 
