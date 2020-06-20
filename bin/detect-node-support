@@ -13,9 +13,6 @@ const NodeSupport = require('..');
 const internals = {};
 
 
-internals.log = Debug('detect-node-support');
-
-
 internals.help = () => {
 
     return `
@@ -33,6 +30,8 @@ Options:
 };
 
 exports.main = async ({ _: [what], deps, deep, dev, json }) => {
+
+    Debug.enable('detect-node-support:warn:*,detect-node-support:error:*');
 
     if (!what) {
         console.log(internals.help());
