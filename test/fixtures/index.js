@@ -7,6 +7,7 @@ const SimpleGit = require('simple-git/promise');
 const Sinon = require('sinon');
 const Tmp = require('tmp');
 
+const Loader = require('../../lib/loader');
 const Utils = require('../../lib/utils');
 
 
@@ -27,6 +28,8 @@ module.exports = class TestContext {
     }
 
     cleanup() {
+
+        Loader.clearCache();
 
         Sinon.restore();
 
@@ -75,7 +78,7 @@ module.exports = class TestContext {
         });
     }
 
-    async setupRepoFolder({ travisYml, packageJson, npmShrinkwrapJson, packageLockJson, git = true } = {}) {
+    async setupRepoFolder({ travisYml, partials, packageJson, npmShrinkwrapJson, packageLockJson, git = true } = {}) {
 
         const tmpObj = Tmp.dirSync({ unsafeCleanup: true });
 
@@ -85,6 +88,22 @@ module.exports = class TestContext {
 
         if (travisYml) {
             Fs.copyFileSync(Path.join(__dirname, 'travis-ymls', travisYml), Path.join(this.path, '.travis.yml'));
+        }
+
+        if (partials) {
+            Fs.mkdirSync(Path.join(this.path, 'partials'));
+            const partialYmls = [
+                'circular.yml',
+                'commitish.yml',
+                'indirect-node-14.yml',
+                'merge-invalid.yml',
+                'node-10.yml',
+                'node-12.yml',
+                'node-14.yml'
+            ];
+            for (const fn of partialYmls) {
+                Fs.copyFileSync(Path.join(__dirname, 'travis-ymls', 'testing-imports', 'partials', fn), Path.join(this.path, 'partials', fn));
+            }
         }
 
         if (packageJson !== false) {

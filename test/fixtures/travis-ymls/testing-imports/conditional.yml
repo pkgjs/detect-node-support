@@ -1,0 +1,4 @@
+language: node_js
+import:
+  - source: partials/indirect-node-14.yml
+    if: branch = master
