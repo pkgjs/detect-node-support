@@ -3,7 +3,7 @@
 const Fs = require('fs');
 const Nock = require('nock');
 const Path = require('path');
-const SimpleGit = require('simple-git/promise');
+const SimpleGit = require('simple-git');
 const Sinon = require('sinon');
 const Tmp = require('tmp');
 
