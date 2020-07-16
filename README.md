@@ -2,6 +2,8 @@
 
 List the Node.js versions supported by the package/repository
 
+This repository is managed by the [Package Maintenance Working Group](https://github.com/nodejs/package-maintenance), see [Governance](https://github.com/nodejs/package-maintenance/blob/master/Governance.md).
+
 ## Usage (command line)
 
 ```
