@@ -2,7 +2,7 @@ version: ~> 1.0
 language: node_js
 
 import:
-  - nodejs/ci-config-travis:lts/gte-10.yml
+  - ljharb/travis-ci:node/all.yml
 
 cache:
   npm: false
