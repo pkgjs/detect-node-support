@@ -37,7 +37,7 @@
   "dependencies": {
     "@hapi/wreck": "^17.0.0",
     "@npmcli/arborist": "0.0.17",
-    "@pkgjs/nv": "0.0.3",
+    "@pkgjs/nv": "0.1.0",
     "debug": "^4.1.1",
     "git-url-parse": "^11.1.2",
     "js-yaml": "^3.13.1",
