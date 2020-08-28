@@ -70,6 +70,11 @@ module.exports = class TestContext {
             .get('/dist/index.json')
             .reply(200, Fs.readFileSync(Path.join(__dirname, 'node-release-dist.json')));
 
+        Nock('https://raw.githubusercontent.com')
+            .persist()
+            .get('/nodejs/ci-config-travis/HEAD/lts/gte-10.yml')
+            .reply(200, Fs.readFileSync(Path.join(__dirname, 'travis-ymls', 'nodejs-ci-config-travis-gte-10.yml')));
+
         this._cleanup.push(() => {
 
             Nock.restore();

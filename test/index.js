@@ -55,7 +55,7 @@ describe('detect-node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '14'],
+                        raw: ['14', '12', '10'],
                         resolved: {
                             '10': '10.20.1',
                             '12': '12.17.0',
@@ -443,7 +443,7 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '14'],
+                        raw: ['14', '12', '10'],
                         resolved: {
                             '10': '10.20.1',
                             '12': '12.17.0',
@@ -476,7 +476,7 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '14'],
+                        raw: ['14', '12', '10'],
                         resolved: {
                             '10': '10.20.1',
                             '12': '12.17.0',
@@ -599,7 +599,7 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '14'],
+                        raw: ['14', '12', '10'],
                         resolved: {
                             '10': '10.20.1',
                             '12': '12.17.0',
@@ -722,7 +722,7 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '14'],
+                        raw: ['14', '12', '10'],
                         resolved: {
                             '10': '10.20.1',
                             '12': '12.17.0',
@@ -768,7 +768,7 @@ describe('detect-node-support', () => {
                     version: '0.0.0-development',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '14'],
+                        raw: ['14', '12', '10'],
                         resolved: {
                             '10': '10.20.1',
                             '12': '12.17.0',
@@ -801,7 +801,7 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '14'],
+                        raw: ['14', '12', '10'],
                         resolved: {
                             '10': '10.20.1',
                             '12': '12.17.0',
@@ -834,7 +834,7 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '14'],
+                        raw: ['14', '12', '10'],
                         resolved: {
                             '10': '10.20.1',
                             '12': '12.17.0',
@@ -871,7 +871,7 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '14'],
+                        raw: ['14', '12', '10'],
                         resolved: {
                             '10': '10.20.1',
                             '12': '12.17.0',
@@ -908,7 +908,7 @@ describe('detect-node-support', () => {
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
                     travis: {
-                        raw: ['10', '12', '14'],
+                        raw: ['14', '12', '10'],
                         resolved: {
                             '10': '10.20.1',
                             '12': '12.17.0',
