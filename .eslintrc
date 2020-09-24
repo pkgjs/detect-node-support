@@ -1,5 +1,5 @@
 {
-  "extends": "@hapi/hapi",
+  "extends": "plugin:@hapi/recommended",
 
   "parserOptions": {
     "ecmaVersion": 2019
