@@ -29,7 +29,7 @@
   "homepage": "https://github.com/pkgjs/detect-node-support#readme",
   "devDependencies": {
     "@hapi/code": "^8.0.0",
-    "@hapi/lab": "^23.0.0",
+    "@hapi/lab": "^24.0.0",
     "allow-scripts": "^1.5.2",
     "nock": "^13.0.0",
     "sinon": "^9.0.0"
