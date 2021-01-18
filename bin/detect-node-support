@@ -29,7 +29,7 @@ Options:
 `;
 };
 
-exports.main = async ({ _: [what], deps, deep, dev, json }) => {
+exports.main = async ({ _: [what], help, deps, deep, dev, json }) => {
 
     const enabledLogs = ['detect-node-support:warn:*', 'detect-node-support:error:*'];
 
@@ -39,9 +39,13 @@ exports.main = async ({ _: [what], deps, deep, dev, json }) => {
 
     Debug.enable(enabledLogs.join(','));
 
-    if (!what) {
+    if (help) {
         console.log(internals.help());
         return;
+    }
+
+    if (!what) {
+        what = process.cwd();
     }
 
     if (!deps && (deep || dev)) {
