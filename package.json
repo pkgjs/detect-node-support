@@ -40,7 +40,7 @@
     "@pkgjs/nv": "0.1.0",
     "debug": "^4.1.1",
     "git-url-parse": "^11.1.2",
-    "js-yaml": "^3.13.1",
+    "js-yaml": "^4.0.0",
     "minimist": "^1.2.5",
     "pacote": "^11.1.0",
     "simple-git": "^2.13.1",
