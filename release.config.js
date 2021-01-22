@@ -1,6 +1,8 @@
 'use strict';
 
 module.exports = {
-    branches: ['main', {name: 'alpha', prerelease: true}]
+    branches: [
+        'main',
+        { name: 'alpha', prerelease: true }
+    ]
 };
-
