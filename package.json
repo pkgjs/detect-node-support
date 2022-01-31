@@ -24,7 +24,7 @@
     "url": "https://github.com/pkgjs/detect-node-support/issues"
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=14"
   },
   "homepage": "https://github.com/pkgjs/detect-node-support#readme",
   "devDependencies": {

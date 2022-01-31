@@ -1,7 +1,7 @@
 language: node_js
 
 import:
-  - nodejs/ci-config-travis:lts/gte-10.yml
+  - nodejs/ci-config-travis:lts/gte-14.yml
 
 cache:
   npm: false

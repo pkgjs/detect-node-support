@@ -62,7 +62,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -454,7 +454,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -491,7 +491,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -518,7 +518,7 @@ describe('detect-node-support', () => {
                     version: '0.0.0-development',
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -621,7 +621,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -686,7 +686,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -717,7 +717,7 @@ describe('detect-node-support', () => {
                     version: '0.0.0-development',
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -815,7 +815,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -865,7 +865,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -902,7 +902,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -939,7 +939,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -980,7 +980,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 

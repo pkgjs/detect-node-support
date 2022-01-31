@@ -72,8 +72,9 @@ module.exports = class TestContext {
 
         Nock('https://api.github.com')
             .persist()
-            .get('/repos/nodejs/ci-config-travis/contents/lts%2Fgte-10.yml')
+            .get('/repos/nodejs/ci-config-travis/contents/lts%2Fgte-14.yml')
             .reply(200, {
+                // note: this is mocked out to an earlier version of node, to avoid having to update too many assertions/fixtures
                 content: Fs.readFileSync(Path.join(__dirname, 'travis-ymls', 'nodejs-ci-config-travis-gte-10.yml')).toString('base64')
             });
 
