@@ -57,9 +57,9 @@ describe('detect-node-support', () => {
                     travis: {
                         raw: ['14', '12', '10'],
                         resolved: {
-                            '10': '10.20.1',
-                            '12': '12.17.0',
-                            '14': '14.3.0'
+                            '10': '10.24.1',
+                            '12': '12.22.9',
+                            '14': '14.18.3'
                         }
                     },
                     engines: '>=14'
@@ -97,7 +97,7 @@ describe('detect-node-support', () => {
                     timestamp: 1580673602000,
                     travis: {
                         raw: ['10'],
-                        resolved: { '10': '10.20.1' }
+                        resolved: { '10': '10.24.1' }
                     }
                 });
             });
@@ -163,7 +163,7 @@ describe('detect-node-support', () => {
                         resolved: {
                             '6': '6.17.1',
                             '8': '8.17.0',
-                            '10': '10.20.1',
+                            '10': '10.24.1',
                             latest: '13.14.0'
                         }
                     }
@@ -195,11 +195,11 @@ describe('detect-node-support', () => {
                             '7': '7.10.1',
                             '8': '8.17.0',
                             '9': '9.11.2',
-                            '10': '10.20.1',
+                            '10': '10.24.1',
                             '11': '11.15.0',
-                            '12': '12.17.0',
+                            '12': '12.22.9',
                             '13': '13.14.0',
-                            'lts/*': '12.17.0'
+                            'lts/*': '12.22.9'
                         }
                     }
                 });
@@ -248,8 +248,8 @@ describe('detect-node-support', () => {
                         raw: ['8', '10', '12'],
                         resolved: {
                             '8': '8.17.0',
-                            '10': '10.20.1',
-                            '12': '12.17.0'
+                            '10': '10.24.1',
+                            '12': '12.22.9'
                         }
                     }
                 });
@@ -275,8 +275,8 @@ describe('detect-node-support', () => {
                             '6': '6.17.1',
                             '8': '8.17.0',
                             '9': '9.11.2',
-                            '10': '10.20.1',
-                            '12': '12.17.0',
+                            '10': '10.24.1',
+                            '12': '12.22.9',
                             'stable': '13.14.0'
                         }
                     }
@@ -301,8 +301,8 @@ describe('detect-node-support', () => {
                         raw: ['node', '10', '12', '8', '6'],
                         resolved: {
                             'node': '13.14.0',
-                            '10': '10.20.1',
-                            '12': '12.17.0',
+                            '10': '10.24.1',
+                            '12': '12.22.9',
                             '8': '8.17.0',
                             '6': '6.17.1'
                         }
@@ -449,9 +449,9 @@ describe('detect-node-support', () => {
                     travis: {
                         raw: ['14', '12', '10'],
                         resolved: {
-                            '10': '10.20.1',
-                            '12': '12.17.0',
-                            '14': '14.3.0'
+                            '10': '10.24.1',
+                            '12': '12.22.9',
+                            '14': '14.18.3'
                         }
                     },
                     engines: '>=14'
@@ -486,9 +486,9 @@ describe('detect-node-support', () => {
                     travis: {
                         raw: ['14', '12', '10'],
                         resolved: {
-                            '10': '10.20.1',
-                            '12': '12.17.0',
-                            '14': '14.3.0'
+                            '10': '10.24.1',
+                            '12': '12.22.9',
+                            '14': '14.18.3'
                         }
                     },
                     engines: '>=14'
@@ -616,9 +616,9 @@ describe('detect-node-support', () => {
                     travis: {
                         raw: ['14', '12', '10'],
                         resolved: {
-                            '10': '10.20.1',
-                            '12': '12.17.0',
-                            '14': '14.3.0'
+                            '10': '10.24.1',
+                            '12': '12.22.9',
+                            '14': '14.18.3'
                         }
                     },
                     engines: '>=14'
@@ -681,9 +681,9 @@ describe('detect-node-support', () => {
                     travis: {
                         raw: ['14', '12', '10'],
                         resolved: {
-                            '10': '10.20.1',
-                            '12': '12.17.0',
-                            '14': '14.3.0'
+                            '10': '10.24.1',
+                            '12': '12.22.9',
+                            '14': '14.18.3'
                         }
                     },
                     engines: '>=14'
@@ -810,9 +810,9 @@ describe('detect-node-support', () => {
                     travis: {
                         raw: ['14', '12', '10'],
                         resolved: {
-                            '10': '10.20.1',
-                            '12': '12.17.0',
-                            '14': '14.3.0'
+                            '10': '10.24.1',
+                            '12': '12.22.9',
+                            '14': '14.18.3'
                         }
                     },
                     engines: '>=14'
@@ -860,9 +860,9 @@ describe('detect-node-support', () => {
                     travis: {
                         raw: ['14', '12', '10'],
                         resolved: {
-                            '10': '10.20.1',
-                            '12': '12.17.0',
-                            '14': '14.3.0'
+                            '10': '10.24.1',
+                            '12': '12.22.9',
+                            '14': '14.18.3'
                         }
                     },
                     engines: '>=14'
@@ -897,9 +897,9 @@ describe('detect-node-support', () => {
                     travis: {
                         raw: ['14', '12', '10'],
                         resolved: {
-                            '10': '10.20.1',
-                            '12': '12.17.0',
-                            '14': '14.3.0'
+                            '10': '10.24.1',
+                            '12': '12.22.9',
+                            '14': '14.18.3'
                         }
                     },
                     engines: '>=14'
@@ -934,9 +934,9 @@ describe('detect-node-support', () => {
                     travis: {
                         raw: ['14', '12', '10'],
                         resolved: {
-                            '10': '10.20.1',
-                            '12': '12.17.0',
-                            '14': '14.3.0'
+                            '10': '10.24.1',
+                            '12': '12.22.9',
+                            '14': '14.18.3'
                         }
                     },
                     engines: '>=14'
@@ -975,9 +975,9 @@ describe('detect-node-support', () => {
                     travis: {
                         raw: ['14', '12', '10'],
                         resolved: {
-                            '10': '10.20.1',
-                            '12': '12.17.0',
-                            '14': '14.3.0'
+                            '10': '10.24.1',
+                            '12': '12.22.9',
+                            '14': '14.18.3'
                         }
                     },
                     engines: '>=14'
@@ -1016,9 +1016,9 @@ describe('detect-node-support', () => {
                     travis: {
                         raw: ['14', '12', '10'],
                         resolved: {
-                            '10': '10.20.1',
-                            '12': '12.17.0',
-                            '14': '14.3.0'
+                            '10': '10.24.1',
+                            '12': '12.22.9',
+                            '14': '14.18.3'
                         }
                     }
                 });
@@ -1105,7 +1105,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.20.1' }
+                                    resolved: { '10': '10.24.1' }
                                 }
                             },
                             {
@@ -1115,7 +1115,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.20.1' }
+                                    resolved: { '10': '10.24.1' }
                                 }
                             }
                         ]
@@ -1151,7 +1151,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.20.1' }
+                                    resolved: { '10': '10.24.1' }
                                 }
                             },
                             {
@@ -1161,7 +1161,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.20.1' }
+                                    resolved: { '10': '10.24.1' }
                                 }
                             }
                         ]
@@ -1197,7 +1197,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.20.1' }
+                                    resolved: { '10': '10.24.1' }
                                 }
                             },
                             {
@@ -1207,7 +1207,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.20.1' }
+                                    resolved: { '10': '10.24.1' }
                                 }
                             }
                         ]
@@ -1245,7 +1245,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.20.1' }
+                                    resolved: { '10': '10.24.1' }
                                 }
                             },
                             {
@@ -1261,7 +1261,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.20.1' }
+                                    resolved: { '10': '10.24.1' }
                                 }
                             },
                             {
@@ -1304,7 +1304,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.20.1' }
+                                    resolved: { '10': '10.24.1' }
                                 }
                             },
                             {
@@ -1320,7 +1320,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.20.1' }
+                                    resolved: { '10': '10.24.1' }
                                 }
                             }
                         ]
@@ -1356,7 +1356,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.20.1' }
+                                    resolved: { '10': '10.24.1' }
                                 }
                             },
                             {
@@ -1366,7 +1366,7 @@ describe('detect-node-support', () => {
                                 commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                                 travis: {
                                     raw: ['10'],
-                                    resolved: { '10': '10.20.1' }
+                                    resolved: { '10': '10.24.1' }
                                 }
                             }
                         ]
