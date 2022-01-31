@@ -44,7 +44,7 @@
     "js-yaml": "^4.0.0",
     "minimist": "^1.2.5",
     "pacote": "^11.1.0",
-    "simple-git": "^2.13.1",
+    "simple-git": "^3.0.0",
     "tmp": "^0.2.0"
   }
 }
