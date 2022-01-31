@@ -62,7 +62,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -454,7 +454,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -491,7 +491,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -518,7 +518,7 @@ describe('detect-node-support', () => {
                     version: '0.0.0-development',
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -596,7 +596,7 @@ describe('detect-node-support', () => {
                         content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
                     })
                     .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
-                    .reply(403, null, {
+                    .reply(403, '', {
                         'x-ratelimit-limit': '60',
                         'x-ratelimit-remaining': '0',
                         'x-ratelimit-reset': `${Math.round(Date.now() / 1000) + 1}`
@@ -621,7 +621,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -635,10 +635,11 @@ describe('detect-node-support', () => {
                     .reply(200, {
                         content: Fs.readFileSync(Path.join(__dirname, '..', 'package.json')).toString('base64')
                     })
+                    // https://docs.github.com/en/rest/overview/resources-in-the-rest-api#secondary-rate-limits
                     .get('/repos/pkgjs/detect-node-support/contents/.travis.yml')
-                    .reply(403, 'Abuse detected');
+                    .reply(403, 'You have exceeded a secondary rate limit');
 
-                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' })).to.reject(/Abuse detected/);
+                await expect(NodeSupport.detect({ repository: 'git+https://github.com/pkgjs/detect-node-support.git' })).to.reject(/You have exceeded a secondary rate limit/);
             });
         });
 
@@ -685,7 +686,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -716,7 +717,7 @@ describe('detect-node-support', () => {
                     version: '0.0.0-development',
                     commit: '9cef39d21ad229dea4b10295f55b0d9a83800b23',
                     timestamp: 1580673602000,
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -814,7 +815,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -864,7 +865,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -901,7 +902,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -938,7 +939,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
@@ -979,7 +980,7 @@ describe('detect-node-support', () => {
                             '14': '14.3.0'
                         }
                     },
-                    engines: '>=10'
+                    engines: '>=14'
                 });
             });
 
