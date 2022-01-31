@@ -58,7 +58,7 @@ describe('.travis.yml parsing', () => {
                 timestamp: 1580673602000,
                 travis: {
                     raw: ['14'],
-                    resolved: { '14': '14.3.0' }
+                    resolved: { '14': '14.18.3' }
                 }
             });
         });
@@ -81,7 +81,7 @@ describe('.travis.yml parsing', () => {
             timestamp: 1580673602000,
             travis: {
                 raw: ['14'],
-                resolved: { '14': '14.3.0' }
+                resolved: { '14': '14.18.3' }
             }
         });
     });
@@ -103,7 +103,7 @@ describe('.travis.yml parsing', () => {
             timestamp: 1580673602000,
             travis: {
                 raw: ['14'],
-                resolved: { '14': '14.3.0' }
+                resolved: { '14': '14.18.3' }
             }
         });
     });
@@ -157,7 +157,7 @@ describe('.travis.yml parsing', () => {
             timestamp: 1580673602000,
             travis: {
                 raw: ['14'],
-                resolved: { '14': '14.3.0' }
+                resolved: { '14': '14.18.3' }
             }
         });
 
@@ -188,8 +188,8 @@ describe('.travis.yml parsing', () => {
                     '8': '8.17.0',
                     '10.15': '10.15.3',
                     '10.16': '10.16.3',
-                    '12': '12.17.0',
-                    '14': '14.3.0'
+                    '12': '12.22.9',
+                    '14': '14.18.3'
                 }
             }
         });
@@ -213,7 +213,7 @@ describe('.travis.yml parsing', () => {
             travis: {
                 raw: ['12'],
                 resolved: {
-                    '12': '12.17.0'
+                    '12': '12.22.9'
                 }
             }
         });
@@ -237,7 +237,7 @@ describe('.travis.yml parsing', () => {
             travis: {
                 raw: ['12'],
                 resolved: {
-                    '12': '12.17.0'
+                    '12': '12.22.9'
                 }
             }
         });
