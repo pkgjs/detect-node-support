@@ -1,6 +1,7 @@
 {
   "extends": [
-    "config:base"
-  ],
-  "rangeStrategy": "replace"
+    "config:base",
+    ":preserveSemverRanges",
+    ":disableDependencyDashboard"
+  ]
 }
