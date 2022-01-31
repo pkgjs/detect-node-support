@@ -9,20 +9,11 @@ on:
 jobs:
 
   test:
-
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [ 16, 14, 12, 10 ]
-
-    steps:
-      - uses: actions/checkout@v2
-      - run: |
-          git config --global user.name github-actions
-          git config --global user.email github-actions@github.com
-      - uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm install
-      - run: npm run test
+    uses: pkgjs/action/.github/workflows/node-test.yaml@v0
+    with:
+      post-checkout-steps: |
+        - name: Set git user to avoid warnings
+          shell: bash
+          run: |
+            git config --global user.name github-actions
+            git config --global user.email github-actions@github.com
