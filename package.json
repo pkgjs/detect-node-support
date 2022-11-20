@@ -37,7 +37,7 @@
   "dependencies": {
     "@npmcli/arborist": "^4.0.0",
     "@octokit/plugin-throttling": "^3.2.2",
-    "@octokit/rest": "^18.0.0",
+    "@octokit/rest": "^19.0.0",
     "@pkgjs/nv": "0.2.1",
     "debug": "^4.1.1",
     "git-url-parse": "^11.1.2",
