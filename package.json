@@ -32,7 +32,7 @@
     "@hapi/lab": "^24.0.0",
     "allow-scripts": "^1.5.2",
     "nock": "^13.0.0",
-    "sinon": "^13.0.0"
+    "sinon": "^15.0.0"
   },
   "dependencies": {
     "@npmcli/arborist": "^4.0.0",
