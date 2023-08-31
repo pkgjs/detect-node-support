@@ -35,7 +35,7 @@
     "sinon": "^13.0.0"
   },
   "dependencies": {
-    "@npmcli/arborist": "^4.0.0",
+    "@npmcli/arborist": "^7.0.0",
     "@octokit/plugin-throttling": "^3.2.2",
     "@octokit/rest": "^18.0.0",
     "@pkgjs/nv": "0.2.1",
