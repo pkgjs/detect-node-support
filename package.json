@@ -38,7 +38,7 @@
     "@npmcli/arborist": "^4.0.0",
     "@octokit/plugin-throttling": "^3.2.2",
     "@octokit/rest": "^18.0.0",
-    "@pkgjs/nv": "0.2.1",
+    "@pkgjs/nv": "0.2.2",
     "debug": "^4.1.1",
     "git-url-parse": "^11.1.2",
     "js-yaml": "^4.0.0",
