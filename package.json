@@ -40,7 +40,7 @@
     "@octokit/rest": "^18.0.0",
     "@pkgjs/nv": "0.2.1",
     "debug": "^4.1.1",
-    "git-url-parse": "^11.1.2",
+    "git-url-parse": "^14.0.0",
     "js-yaml": "^4.0.0",
     "minimist": "^1.2.5",
     "pacote": "^12.0.0",
