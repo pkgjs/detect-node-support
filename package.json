@@ -31,7 +31,7 @@
     "@hapi/code": "^8.0.0",
     "@hapi/lab": "^24.0.0",
     "allow-scripts": "^1.5.2",
-    "nock": "^13.0.0",
+    "nock": "^14.0.0",
     "sinon": "^13.0.0"
   },
   "dependencies": {
